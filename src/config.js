@@ -8,7 +8,7 @@ export const initialSectionVisibility = {
     resume: true,
     projects: true,
     certificates: true,
-    coding: false,
+    coding: true,
     contact: true,
     background3D: false
 };
