@@ -125,14 +125,17 @@ const PortfolioSite = () => {
     }, []);
 
     const scrollToSection = (ref) => {
-        ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (ref.current) {
+            const y = ref.current.getBoundingClientRect().top + window.scrollY - 100; // 100px offset for fixed navbar
+            window.scrollTo({ top: y, behavior: 'smooth' });
+        }
     };
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Agentic AI Search Handler
+    // Agentic AI Search Handler (Local Simulation)
     const handleAgenticSearch = async () => {
         if (!searchQuery.trim()) return;
 
@@ -140,67 +143,100 @@ const PortfolioSite = () => {
         setAiResponse('');
         setSuggestedSection(null);
 
+        // Simulate network delay for "AI thinking" effect
+        await new Promise(resolve => setTimeout(resolve, 800));
+
         try {
-            const response = await fetch("https://api.anthropic.com/v1/messages", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    model: "claude-sonnet-4-20250514",
-                    max_tokens: 1000,
-                    messages: [{
-                        role: "user",
-                        content: `You are an intelligent portfolio assistant. Based on this query: "${searchQuery}"
+            const query = searchQuery.toLowerCase();
+            let result = { action: "answer", response: "I'm not sure about that. Try asking about my skills, projects, or contact info." };
 
-Portfolio Data:
-- Name: ${portfolioData.name}
-- Title: ${portfolioData.title}
-- Email: ${portfolioData.email}
-- Phone: ${portfolioData.phone}
-- Location: ${portfolioData.location}
-- Skills: ${portfolioData.skills.join(', ')}
-- Experience: ${JSON.stringify(portfolioData.experience)}
-- Projects: ${JSON.stringify(portfolioData.projects)}
-- Certificates: ${JSON.stringify(portfolioData.certificates)}
-- Coding Platforms: ${JSON.stringify(portfolioData.codingPlatforms)}
-- Resume: ${JSON.stringify(portfolioData.resume)}
-
-Analyze the query and respond with ONLY a JSON object (no markdown, no preamble):
-{
-  "action": "navigate" or "answer" or "suggest",
-  "section": "home" or "about" or "resume" or "projects" or "certificates" or "coding" or "contact" (only if action is navigate or suggest),
-  "response": "your helpful response here"
-}
-
-- Use "navigate" when user explicitly asks to go/show/navigate to a section
-- Use "suggest" when user asks about content that's in a specific section (like "what are my certificates", "my coding profiles", "my projects")
-- Use "answer" for general questions
-If they ask a question about skills, experience, or want information, set action to "answer".`
-                    }]
-                })
-            });
-
-            const data = await response.json();
-            const text = data.content.map(item => item.type === "text" ? item.text : "").join("");
-            const clean = text.replace(/```json|```/g, "").trim();
-            const result = JSON.parse(clean);
+            // Keyword Matching Logic
+            if (query.includes('project') || query.includes('work') || query.includes('built')) {
+                result = {
+                    action: "suggest",
+                    section: "projects",
+                    response: `I've worked on several exciting projects like ${portfolioData.projects.map(p => p.name).join(', ')}. Would you like to see them?`
+                };
+            } else if (query.includes('skill') || query.includes('tech') || query.includes('stack')) {
+                result = {
+                    action: "suggest",
+                    section: "about",
+                    response: `I'm proficient in ${portfolioData.skills.slice(0, 5).join(', ')} and more. You can check out my full skillset in the About section.`
+                };
+            } else if (query.includes('contact') || query.includes('email') || query.includes('reach') || query.includes('hire')) {
+                result = {
+                    action: "suggest",
+                    section: "contact",
+                    response: "You can reach me via email or phone. Would you like to go to the contact section?"
+                };
+            } else if (query.includes('resume') || query.includes('cv')) {
+                result = {
+                    action: "suggest",
+                    section: "resume",
+                    response: "My resume details my professional experience and education. You can view or download it here."
+                };
+            } else if (query.includes('experience') || query.includes('job') || query.includes('intern')) {
+                result = {
+                    action: "suggest",
+                    section: "about",
+                    response: "I have experience as a Full Stack Developer and SDE Intern. Would you like to see the details?"
+                };
+            } else if (query.includes('certificate')) {
+                result = {
+                    action: "suggest",
+                    section: "certificates",
+                    response: "I have earned certificates from Red Hat, AWS, HackerRank, and Microsoft. I can show you the verifications."
+                };
+                result = {
+                    action: "suggest",
+                    section: "coding",
+                    response: "I solve problems on LeetCode and other platforms. Would you like to see my stats?"
+                };
+            } else if (query.includes('education') || query.includes('degree') || query.includes('university') || query.includes('college') || query.includes('study')) {
+                result = {
+                    action: "suggest",
+                    section: "resume",
+                    response: "I am pursuing a B.Tech in Computer Science at KL University. Educational details are in my resume section."
+                };
+            } else if (query.includes('location') || query.includes('live') || query.includes('from')) {
+                result = {
+                    action: "suggest",
+                    section: "contact",
+                    response: `I am currently based in ${portfolioData.location}.`
+                };
+            } else if (query.includes('phone') || query.includes('call') || query.includes('number')) {
+                result = {
+                    action: "suggest",
+                    section: "contact",
+                    response: `My phone number is ${portfolioData.phone}. You can find more contact details in the Contact section.`
+                };
+            } else if (query.includes('ai agentic') || query.includes('portfolio')) {
+                result = {
+                    action: "suggest",
+                    section: "projects",
+                    response: "You're looking at the AI Agentic Portfolio right now! It features this AI assistant and dynamic configuration."
+                };
+            } else if (query.includes('hello') || query.includes('hi')) {
+                result = {
+                    action: "answer",
+                    response: `Hello! I'm ${portfolioData.name}'s AI assistant. Ask me about my projects, skills, education, or experience!`
+                };
+            }
 
             setAiResponse(result.response);
 
             if (result.action === "navigate" && result.section) {
-                // Auto-navigate: Close popup and scroll
                 setTimeout(() => {
                     const refs = { home: homeRef, about: aboutRef, resume: resumeRef, projects: projectsRef, certificates: certificatesRef, coding: codingRef, contact: contactRef };
                     setShowAIPopup(false);
                     setTimeout(() => scrollToSection(refs[result.section]), 300);
                 }, 1500);
             } else if (result.action === "suggest" && result.section) {
-                // Show button to navigate
                 setSuggestedSection(result.section);
             }
         } catch (error) {
-            setAiResponse("I'm having trouble processing that. Could you rephrase?");
+            console.error(error);
+            setAiResponse("I encountered an error. Please try again.");
         } finally {
             setIsProcessing(false);
         }
