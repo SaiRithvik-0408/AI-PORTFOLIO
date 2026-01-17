@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, User, Briefcase, Mail, Code, Sparkles, Github, Linkedin, Menu, X, ChevronDown } from 'lucide-react';
+import { Search, User, Briefcase, Mail, Code, Sparkles, Github, Linkedin, Menu, X, ChevronDown, RefreshCw } from 'lucide-react';
 import { portfolioData, getSectionVisibility } from './config';
 import { processAIQuery } from './utils/aiLogic';
 import { handleContactSubmit } from './utils/contactHandler';
+import { fetchLeetCodeStats, clearLeetCodeCache, getLeetCodeCacheTimestamp } from './utils/leetcodeApi';
+import { fetchCodeChefStats, clearCodeChefCache, getCodeChefCacheTimestamp } from './utils/codechefApi';
 
 const PortfolioSite = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -12,6 +14,9 @@ const PortfolioSite = () => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
     const [formStatus, setFormStatus] = useState({ type: '', message: '' });
     const [sectionVisibility] = useState(getSectionVisibility());
+    const [codingPlatforms, setCodingPlatforms] = useState(portfolioData.codingPlatforms);
+    const [isLoadingStats, setIsLoadingStats] = useState(false);
+    const [lastUpdated, setLastUpdated] = useState(null);
 
     const handleFormChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -148,6 +153,63 @@ const PortfolioSite = () => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
+
+    // Fetch coding platform stats on mount
+    useEffect(() => {
+        if (portfolioData.dynamicCodingStats && sectionVisibility.coding) {
+            fetchCodingStats();
+        }
+    }, [sectionVisibility.coding]);
+
+    const fetchCodingStats = async () => {
+        setIsLoadingStats(true);
+        const updatedPlatforms = [...portfolioData.codingPlatforms];
+
+        for (let i = 0; i < updatedPlatforms.length; i++) {
+            const platform = updatedPlatforms[i];
+
+            if (platform.name === "LeetCode") {
+                const stats = await fetchLeetCodeStats(platform.username);
+                if (stats) {
+                    updatedPlatforms[i] = { ...platform, stats };
+                }
+            } else if (platform.name === "CodeChef") {
+                const stats = await fetchCodeChefStats(platform.username);
+                if (stats) {
+                    updatedPlatforms[i] = { ...platform, stats };
+                }
+            }
+        }
+
+        setCodingPlatforms(updatedPlatforms);
+        setIsLoadingStats(false);
+        setLastUpdated(Date.now());
+    };
+
+    const handleRefreshStats = async () => {
+        // Clear caches
+        portfolioData.codingPlatforms.forEach(platform => {
+            if (platform.name === "LeetCode") {
+                clearLeetCodeCache(platform.username);
+            } else if (platform.name === "CodeChef") {
+                clearCodeChefCache(platform.username);
+            }
+        });
+
+        // Fetch fresh data
+        await fetchCodingStats();
+    };
+
+    const getTimeSinceUpdate = () => {
+        if (!lastUpdated) return 'Never';
+        const minutes = Math.floor((Date.now() - lastUpdated) / 60000);
+        if (minutes < 1) return 'Just now';
+        if (minutes === 1) return '1 minute ago';
+        if (minutes < 60) return `${minutes} minutes ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours === 1) return '1 hour ago';
+        return `${hours} hours ago`;
+    };
 
     const scrollToSection = (ref) => {
         if (ref.current) {
@@ -519,13 +581,36 @@ const PortfolioSite = () => {
                     {/* Coding Platforms Section */}
                     {sectionVisibility.coding && (
                         <section ref={codingRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10">
-                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 flex items-center gap-3">
-                                <Code className="text-yellow-400" size={32} md:size={40} />
-                                Coding Platforms
-                            </h2>
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+                                <h2 className="text-3xl md:text-5xl font-bold text-white flex items-center gap-3">
+                                    <Code className="text-yellow-400" size={32} md:size={40} />
+                                    Coding Platforms
+                                </h2>
+                                <div className="flex items-center gap-4">
+                                    {lastUpdated && (
+                                        <span className="text-sm text-gray-400">
+                                            Last updated: {getTimeSinceUpdate()}
+                                        </span>
+                                    )}
+                                    <button
+                                        onClick={handleRefreshStats}
+                                        disabled={isLoadingStats}
+                                        className="flex items-center gap-2 px-4 py-2 bg-yellow-500/20 hover:bg-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed text-yellow-300 rounded-lg transition-all text-sm"
+                                        title="Refresh Stats"
+                                    >
+                                        <RefreshCw size={16} className={isLoadingStats ? 'animate-spin' : ''} />
+                                        Refresh
+                                    </button>
+                                </div>
+                            </div>
                             <div className="grid md:grid-cols-3 gap-6">
-                                {portfolioData.codingPlatforms.map((platform, i) => (
-                                    <div key={i} className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 backdrop-blur-lg rounded-xl p-6 border border-yellow-500/30 hover:border-yellow-500/60 transition-all hover:scale-105">
+                                {codingPlatforms.map((platform, i) => (
+                                    <div key={i} className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 backdrop-blur-lg rounded-xl p-6 border border-yellow-500/30 hover:border-yellow-500/60 transition-all hover:scale-105 relative">
+                                        {isLoadingStats && (
+                                            <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
+                                                <RefreshCw className="text-yellow-400 animate-spin" size={32} />
+                                            </div>
+                                        )}
                                         <div className="flex items-center justify-between mb-4">
                                             <h3 className="text-2xl font-semibold text-white">{platform.name}</h3>
                                             {platform.stats.stars && (

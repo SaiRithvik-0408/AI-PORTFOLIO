@@ -103,14 +103,22 @@ export const portfolioData = {
         }
     ],
     codingPlatforms: [
-        // Data hidden via sectionVisibility.coding = false
+        // Dynamic data fetching enabled - stats will be fetched from APIs
         {
             name: "LeetCode",
             username: "SaiRithvik-0408",
             stats: { solved: 0, easy: 0, medium: 0, hard: 0, ranking: "N/A" },
             badges: []
+        },
+        {
+            name: "CodeChef",
+            username: "sairithvik0408",
+            stats: { rating: 0, stars: "0★", globalRank: "N/A", countryRank: "N/A" },
+            badges: []
         }
     ],
+    // Enable dynamic fetching of coding platform stats
+    dynamicCodingStats: true,
     resume: {
         summary: "I am a person with strong determination, looking to use my solid background in computer science and practical knowledge of data structures and algorithms and web development. I aspire to work as a Software Developer Engineer, where I can bring fresh ideas to the table and further develop my skills in web development technologies.",
         education: [
