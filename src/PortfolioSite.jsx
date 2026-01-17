@@ -17,6 +17,11 @@ const PortfolioSite = () => {
     const [codingPlatforms, setCodingPlatforms] = useState(portfolioData.codingPlatforms);
     const [isLoadingStats, setIsLoadingStats] = useState(false);
     const [lastUpdated, setLastUpdated] = useState(null);
+    const [selectedProject, setSelectedProject] = useState(null);
+    const [showProjectModal, setShowProjectModal] = useState(false);
+    const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+    const [feedbackData, setFeedbackData] = useState({ name: '', email: '', suggestion: '' });
+    const [feedbackStatus, setFeedbackStatus] = useState({ type: '', message: '' });
 
     const handleFormChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -529,7 +534,14 @@ const PortfolioSite = () => {
                             </h2>
                             <div className="grid md:grid-cols-2 gap-6">
                                 {portfolioData.projects.map((project, i) => (
-                                    <div key={i} className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 backdrop-blur-lg rounded-xl p-6 border border-indigo-500/30 hover:border-indigo-500/60 transition-all hover:scale-105">
+                                    <div
+                                        key={i}
+                                        onClick={() => {
+                                            setSelectedProject(project);
+                                            setShowProjectModal(true);
+                                        }}
+                                        className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 backdrop-blur-lg rounded-xl p-6 border border-indigo-500/30 hover:border-indigo-500/60 transition-all hover:scale-105 cursor-pointer"
+                                    >
                                         <h3 className="text-2xl font-semibold text-white mb-3">{project.name}</h3>
                                         <p className="text-gray-400 mb-4">{project.description}</p>
                                         <div className="flex flex-wrap gap-2">
@@ -538,6 +550,12 @@ const PortfolioSite = () => {
                                                     {tech}
                                                 </span>
                                             ))}
+                                        </div>
+                                        <div className="mt-4 text-sm text-indigo-400 flex items-center gap-2">
+                                            <span>Click for more details</span>
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                            </svg>
                                         </div>
                                     </div>
                                 ))}
@@ -603,82 +621,99 @@ const PortfolioSite = () => {
                                     </button>
                                 </div>
                             </div>
-                            <div className="grid md:grid-cols-3 gap-6">
-                                {codingPlatforms.map((platform, i) => (
-                                    <div key={i} className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 backdrop-blur-lg rounded-xl p-6 border border-yellow-500/30 hover:border-yellow-500/60 transition-all hover:scale-105 relative">
-                                        {isLoadingStats && (
-                                            <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
-                                                <RefreshCw className="text-yellow-400 animate-spin" size={32} />
-                                            </div>
-                                        )}
-                                        <div className="flex items-center justify-between mb-4">
-                                            <h3 className="text-2xl font-semibold text-white">{platform.name}</h3>
-                                            {platform.stats.stars && (
-                                                <span className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded text-sm font-bold">
-                                                    {platform.stats.stars}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <p className="text-gray-400 mb-4">@{platform.username}</p>
-                                        <div className="space-y-2">
-                                            {platform.name === "LeetCode" && (
-                                                <>
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-gray-400">Total Solved:</span>
-                                                        <span className="text-green-400 font-semibold">{platform.stats.solved}</span>
+                            <div className="grid md:grid-cols-2 gap-6">
+                                {codingPlatforms.map((platform, i) => {
+                                    // Generate profile URLs
+                                    const profileUrls = {
+                                        "LeetCode": `https://leetcode.com/${platform.username}`,
+                                        "CodeChef": `https://www.codechef.com/users/${platform.username}`,
+                                        "Codeforces": `https://codeforces.com/profile/${platform.username}`
+                                    };
+
+                                    return (
+                                        <a
+                                            key={i}
+                                            href={profileUrls[platform.name] || '#'}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block"
+                                        >
+                                            <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 backdrop-blur-lg rounded-xl p-6 border border-yellow-500/30 hover:border-yellow-500/60 transition-all hover:scale-105 relative cursor-pointer">
+                                                {isLoadingStats && (
+                                                    <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
+                                                        <RefreshCw className="text-yellow-400 animate-spin" size={32} />
                                                     </div>
-                                                    <div className="flex gap-2 text-xs">
-                                                        <span className="px-2 py-1 bg-green-500/20 text-green-300 rounded">Easy: {platform.stats.easy}</span>
-                                                        <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded">Medium: {platform.stats.medium}</span>
-                                                        <span className="px-2 py-1 bg-red-500/20 text-red-300 rounded">Hard: {platform.stats.hard}</span>
-                                                    </div>
-                                                    <div className="text-sm text-gray-400">Ranking: {platform.stats.ranking}</div>
-                                                </>
-                                            )}
-                                            {platform.name === "CodeChef" && (
-                                                <>
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-gray-400">Rating:</span>
-                                                        <span className="text-yellow-400 font-semibold">{platform.stats.rating}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-gray-400">Global Rank:</span>
-                                                        <span className="text-purple-400 font-semibold">#{platform.stats.globalRank}</span>
-                                                    </div>
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-gray-400">Country Rank:</span>
-                                                        <span className="text-blue-400 font-semibold">#{platform.stats.countryRank}</span>
-                                                    </div>
-                                                </>
-                                            )}
-                                            {platform.name === "Codeforces" && (
-                                                <>
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-gray-400">Rating:</span>
-                                                        <span className="text-purple-400 font-semibold">{platform.stats.rating}</span>
-                                                    </div>
-                                                    <div className="text-sm text-gray-400">Rank: {platform.stats.rank}</div>
-                                                    <div className="flex justify-between text-sm">
-                                                        <span className="text-gray-400">Max Rating:</span>
-                                                        <span className="text-indigo-400 font-semibold">{platform.stats.maxRating}</span>
-                                                    </div>
-                                                    <div className="text-sm text-gray-400">Contests: {platform.stats.contests}</div>
-                                                </>
-                                            )}
-                                        </div>
-                                        {platform.badges.length > 0 && (
-                                            <div className="mt-4 pt-4 border-t border-white/10">
-                                                <div className="flex flex-wrap gap-2">
-                                                    {platform.badges.map((badge, j) => (
-                                                        <span key={j} className="px-2 py-1 bg-orange-500/20 text-orange-300 rounded text-xs">
-                                                            🏆 {badge}
+                                                )}
+                                                <div className="flex items-center justify-between mb-4">
+                                                    <h3 className="text-2xl font-semibold text-white">{platform.name}</h3>
+                                                    {platform.stats.stars && (
+                                                        <span className="px-3 py-1 bg-yellow-500/20 text-yellow-300 rounded text-sm font-bold">
+                                                            {platform.stats.stars}
                                                         </span>
-                                                    ))}
+                                                    )}
                                                 </div>
+                                                <p className="text-gray-400 mb-4">@{platform.username}</p>
+                                                <div className="space-y-2">
+                                                    {platform.name === "LeetCode" && (
+                                                        <>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-400">Total Solved:</span>
+                                                                <span className="text-green-400 font-semibold">{platform.stats.solved}</span>
+                                                            </div>
+                                                            <div className="flex gap-2 text-xs">
+                                                                <span className="px-2 py-1 bg-green-500/20 text-green-300 rounded">Easy: {platform.stats.easy}</span>
+                                                                <span className="px-2 py-1 bg-yellow-500/20 text-yellow-300 rounded">Medium: {platform.stats.medium}</span>
+                                                                <span className="px-2 py-1 bg-red-500/20 text-red-300 rounded">Hard: {platform.stats.hard}</span>
+                                                            </div>
+                                                            <div className="text-sm text-gray-400">Ranking: {platform.stats.ranking}</div>
+                                                        </>
+                                                    )}
+                                                    {platform.name === "CodeChef" && (
+                                                        <>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-400">Rating:</span>
+                                                                <span className="text-yellow-400 font-semibold">{platform.stats.rating}</span>
+                                                            </div>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-400">Global Rank:</span>
+                                                                <span className="text-purple-400 font-semibold">#{platform.stats.globalRank}</span>
+                                                            </div>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-400">Country Rank:</span>
+                                                                <span className="text-blue-400 font-semibold">#{platform.stats.countryRank}</span>
+                                                            </div>
+                                                        </>
+                                                    )}
+                                                    {platform.name === "Codeforces" && (
+                                                        <>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-400">Rating:</span>
+                                                                <span className="text-purple-400 font-semibold">{platform.stats.rating}</span>
+                                                            </div>
+                                                            <div className="text-sm text-gray-400">Rank: {platform.stats.rank}</div>
+                                                            <div className="flex justify-between text-sm">
+                                                                <span className="text-gray-400">Max Rating:</span>
+                                                                <span className="text-indigo-400 font-semibold">{platform.stats.maxRating}</span>
+                                                            </div>
+                                                            <div className="text-sm text-gray-400">Contests: {platform.stats.contests}</div>
+                                                        </>
+                                                    )}
+                                                </div>
+                                                {platform.badges.length > 0 && (
+                                                    <div className="mt-4 pt-4 border-t border-white/10">
+                                                        <div className="flex flex-wrap gap-2">
+                                                            {platform.badges.map((badge, j) => (
+                                                                <span key={j} className="px-2 py-1 bg-orange-500/20 text-orange-300 rounded text-xs">
+                                                                    🏆 {badge}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
                                             </div>
-                                        )}
-                                    </div>
-                                ))}
+                                        </a>
+                                    );
+                                })}
                             </div>
                         </section>
                     )}
@@ -797,17 +832,101 @@ const PortfolioSite = () => {
                 </div>
 
                 {/* AI Search Popup */}
-                {showAIPopup && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                        <div className="bg-slate-800/95 backdrop-blur-lg rounded-2xl border border-indigo-500/30 max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl">
-                            <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 p-6 border-b border-white/10">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <Sparkles className="text-indigo-400" size={28} />
-                                        <h3 className="text-2xl font-semibold text-white">AI Assistant</h3>
+                {
+                    showAIPopup && (
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                            <div className="bg-slate-800/95 backdrop-blur-lg rounded-2xl border border-indigo-500/30 max-w-2xl w-full max-h-[80vh] overflow-hidden shadow-2xl">
+                                <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 p-6 border-b border-white/10">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-3">
+                                            <Sparkles className="text-indigo-400" size={28} />
+                                            <h3 className="text-2xl font-semibold text-white">AI Assistant</h3>
+                                        </div>
+                                        <button
+                                            onClick={() => setShowAIPopup(false)}
+                                            className="text-gray-400 hover:text-white transition-all"
+                                        >
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
                                     </div>
+                                </div>
+
+                                <div className="p-6 space-y-4">
+                                    <div className="flex gap-3">
+                                        <input
+                                            type="text"
+                                            value={searchQuery}
+                                            onChange={(e) => setSearchQuery(e.target.value)}
+                                            onKeyPress={(e) => e.key === 'Enter' && handleAgenticSearch()}
+                                            placeholder="Ask me anything... (e.g., 'show me projects', 'what are your skills?', 'go to contact')"
+                                            className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
+                                            autoFocus
+                                        />
+                                        <button
+                                            onClick={handleAgenticSearch}
+                                            disabled={isProcessing}
+                                            className="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 disabled:bg-gray-600 text-white rounded-lg transition-all flex items-center gap-2 whitespace-nowrap"
+                                        >
+                                            <Search size={20} />
+                                            {isProcessing ? 'Thinking...' : 'Ask'}
+                                        </button>
+                                    </div>
+
+                                    {aiResponse && (
+                                        <div className="p-4 bg-white/5 rounded-lg border border-white/10 max-h-96 overflow-y-auto">
+                                            <p className="text-gray-300 leading-relaxed">{aiResponse}</p>
+                                            {suggestedSection && (
+                                                <button
+                                                    onClick={handleSuggestedNavigation}
+                                                    className="mt-4 w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg transition-all flex items-center justify-center gap-2"
+                                                >
+                                                    View {suggestedSection.charAt(0).toUpperCase() + suggestedSection.slice(1)} Section
+                                                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                        </div>
+                                    )}
+
+                                    {!aiResponse && !isProcessing && (
+                                        <div className="text-center py-8">
+                                            <p className="text-gray-400 mb-4">Try asking me:</p>
+                                            <div className="flex flex-wrap gap-2 justify-center">
+                                                {[
+                                                    "Show me your resume",
+                                                    "What are my certificates?",
+                                                    "Show me coding profiles",
+                                                    "Tell me about your experience"
+                                                ].map((suggestion, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => setSearchQuery(suggestion)}
+                                                        className="px-4 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 rounded-lg text-sm transition-all"
+                                                    >
+                                                        {suggestion}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Resume Preview Modal */}
+                {
+                    showResumePreview && (
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                            <div className="bg-slate-800/95 backdrop-blur-lg rounded-2xl border border-cyan-500/30 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
+                                <div className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 p-6 border-b border-white/10 flex items-center justify-between">
+                                    <h3 className="text-2xl font-semibold text-white">Resume Preview</h3>
                                     <button
-                                        onClick={() => setShowAIPopup(false)}
+                                        onClick={() => setShowResumePreview(false)}
                                         className="text-gray-400 hover:text-white transition-all"
                                     >
                                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -815,167 +934,286 @@ const PortfolioSite = () => {
                                         </svg>
                                     </button>
                                 </div>
-                            </div>
 
-                            <div className="p-6 space-y-4">
-                                <div className="flex gap-3">
-                                    <input
-                                        type="text"
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        onKeyPress={(e) => e.key === 'Enter' && handleAgenticSearch()}
-                                        placeholder="Ask me anything... (e.g., 'show me projects', 'what are your skills?', 'go to contact')"
-                                        className="flex-1 px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
-                                        autoFocus
-                                    />
-                                    <button
-                                        onClick={handleAgenticSearch}
-                                        disabled={isProcessing}
-                                        className="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 disabled:bg-gray-600 text-white rounded-lg transition-all flex items-center gap-2 whitespace-nowrap"
-                                    >
-                                        <Search size={20} />
-                                        {isProcessing ? 'Thinking...' : 'Ask'}
+                                <div className="p-4 md:p-8 overflow-y-auto max-h-[calc(90vh-100px)]">
+                                    {/* Resume Content */}
+                                    <div className="bg-white text-gray-900 p-6 md:p-12 rounded-lg">
+                                        {/* Header */}
+                                        <div className="text-center mb-8 pb-6 border-b-2 border-gray-300">
+                                            <h1 className="text-2xl md:text-4xl font-bold mb-2">{portfolioData.name}</h1>
+                                            <p className="text-lg md:text-xl text-gray-600 mb-3">{portfolioData.title}</p>
+                                            <div className="flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 text-sm text-gray-600">
+                                                <span>{portfolioData.email}</span>
+                                                <span className="hidden md:inline">•</span>
+                                                <span>{portfolioData.phone}</span>
+                                                <span className="hidden md:inline">•</span>
+                                                <span>{portfolioData.location}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Summary */}
+                                        <div className="mb-6 text-left">
+                                            <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Professional Summary</h2>
+                                            <p className="text-gray-700 leading-relaxed text-sm md:text-base">{portfolioData.resume.summary}</p>
+                                        </div>
+
+                                        {/* Education */}
+                                        <div className="mb-6 text-left">
+                                            <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Education</h2>
+                                            {portfolioData.resume.education.map((edu, i) => (
+                                                <div key={i} className="mb-4">
+                                                    <h3 className="text-base md:text-lg font-semibold">{edu.degree}</h3>
+                                                    <p className="text-gray-700 text-sm md:text-base">{edu.university} | {edu.year} | GPA: {edu.gpa}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Experience */}
+                                        <div className="mb-6 text-left">
+                                            <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Work Experience</h2>
+                                            {portfolioData.experience.map((exp, i) => (
+                                                <div key={i} className="mb-4">
+                                                    <h3 className="text-base md:text-lg font-semibold">{exp.role}</h3>
+                                                    <p className="text-gray-600 mb-1 text-sm md:text-base">{exp.company} | {exp.duration}</p>
+                                                    <p className="text-gray-700 text-sm md:text-base">{exp.description}</p>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Skills */}
+                                        <div className="mb-6 text-left">
+                                            <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Technical Skills</h2>
+                                            <p className="text-gray-700 text-sm md:text-base">{portfolioData.skills.join(' • ')}</p>
+                                        </div>
+
+                                        {/* Certifications */}
+                                        <div className="text-left">
+                                            <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Certifications</h2>
+                                            {portfolioData.certificates.map((cert, i) => (
+                                                <div key={i} className="mb-2">
+                                                    <p className="text-gray-700 text-sm md:text-base"><strong>{cert.name}</strong> - {cert.issuer} ({cert.date})</p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex justify-center mt-6">
+                                        <button
+                                            onClick={() => window.open(portfolioData.resume.downloadLink, '_blank')}
+                                            className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-lg transition-all flex items-center gap-3 font-semibold"
+                                        >
+                                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            Download as PDF
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Project Detail Modal */}
+                {showProjectModal && selectedProject && (
+                    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" onClick={() => setShowProjectModal(false)}>
+                        <div className="bg-slate-800/95 backdrop-blur-lg rounded-2xl border border-indigo-500/30 max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                            <div className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 p-6 border-b border-white/10 sticky top-0 backdrop-blur-lg z-10">
+                                <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                        <h3 className="text-3xl font-bold text-white mb-2">{selectedProject.name}</h3>
+                                        <div className="flex flex-wrap gap-2">
+                                            {selectedProject.tech.split(', ').map((tech, j) => (
+                                                <span key={j} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded text-sm">{tech}</span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <button onClick={() => setShowProjectModal(false)} className="ml-4 text-gray-400 hover:text-white transition-all p-2 hover:bg-white/10 rounded-lg">
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
                                     </button>
                                 </div>
-
-                                {aiResponse && (
-                                    <div className="p-4 bg-white/5 rounded-lg border border-white/10 max-h-96 overflow-y-auto">
-                                        <p className="text-gray-300 leading-relaxed">{aiResponse}</p>
-                                        {suggestedSection && (
-                                            <button
-                                                onClick={handleSuggestedNavigation}
-                                                className="mt-4 w-full px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white rounded-lg transition-all flex items-center justify-center gap-2"
-                                            >
-                                                View {suggestedSection.charAt(0).toUpperCase() + suggestedSection.slice(1)} Section
-                                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                                </svg>
-                                            </button>
-                                        )}
+                            </div>
+                            <div className="p-6 space-y-6">
+                                {/* Project Images */}
+                                {((selectedProject.images && selectedProject.images.length > 0) || selectedProject.image) && (
+                                    <div className="rounded-lg overflow-hidden border border-indigo-500/30">
+                                        <img
+                                            src={selectedProject.image}
+                                            alt={selectedProject.name}
+                                            className="w-full h-auto object-cover"
+                                        />
                                     </div>
                                 )}
 
-                                {!aiResponse && !isProcessing && (
-                                    <div className="text-center py-8">
-                                        <p className="text-gray-400 mb-4">Try asking me:</p>
-                                        <div className="flex flex-wrap gap-2 justify-center">
-                                            {[
-                                                "Show me your resume",
-                                                "What are my certificates?",
-                                                "Show me coding profiles",
-                                                "Tell me about your experience"
-                                            ].map((suggestion, i) => (
-                                                <button
-                                                    key={i}
-                                                    onClick={() => setSearchQuery(suggestion)}
-                                                    className="px-4 py-2 bg-indigo-500/20 hover:bg-indigo-500/30 text-indigo-300 rounded-lg text-sm transition-all"
-                                                >
-                                                    {suggestion}
-                                                </button>
+                                {/* Project Description */}
+                                <div>
+                                    <h4 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                                        <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        Project Overview
+                                    </h4>
+                                    <p className="text-gray-300 leading-relaxed">{selectedProject.detailedDescription || selectedProject.description}</p>
+                                </div>
+
+                                {/* Features & Analysis */}
+                                {selectedProject.features && selectedProject.features.length > 0 && (
+                                    <div>
+                                        <h4 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                                            <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Features & Analysis
+                                        </h4>
+                                        <ul className="space-y-2">
+                                            {selectedProject.features.map((feature, idx) => (
+                                                <li key={idx} className="flex items-start gap-3 text-gray-300">
+                                                    <svg className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                    <span>{feature}</span>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {/* Key Business Questions */}
+                                {selectedProject.businessQuestions && selectedProject.businessQuestions.length > 0 && (
+                                    <div>
+                                        <h4 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                                            <svg className="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            Key Business Questions Answered
+                                        </h4>
+                                        <div className="space-y-4">
+                                            {selectedProject.businessQuestions.map((item, idx) => (
+                                                <div key={idx} className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+                                                    <div className="flex items-start gap-3 mb-2">
+                                                        <svg className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                        </svg>
+                                                        <p className="text-white font-semibold">{typeof item === 'string' ? item : item.question}</p>
+                                                    </div>
+                                                    {item.answer && (
+                                                        <div className="ml-8 mt-2 p-3 bg-slate-900/50 rounded border-l-2 border-purple-400">
+                                                            <p className="text-gray-300 text-sm leading-relaxed">{item.answer}</p>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             ))}
                                         </div>
                                     </div>
                                 )}
-                            </div>
-                        </div>
-                    </div>
-                )}
 
-                {/* Resume Preview Modal */}
-                {showResumePreview && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                        <div className="bg-slate-800/95 backdrop-blur-lg rounded-2xl border border-cyan-500/30 max-w-4xl w-full max-h-[90vh] overflow-hidden shadow-2xl">
-                            <div className="bg-gradient-to-r from-cyan-500/20 to-blue-500/20 p-6 border-b border-white/10 flex items-center justify-between">
-                                <h3 className="text-2xl font-semibold text-white">Resume Preview</h3>
-                                <button
-                                    onClick={() => setShowResumePreview(false)}
-                                    className="text-gray-400 hover:text-white transition-all"
-                                >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            </div>
-
-                            <div className="p-4 md:p-8 overflow-y-auto max-h-[calc(90vh-100px)]">
-                                {/* Resume Content */}
-                                <div className="bg-white text-gray-900 p-6 md:p-12 rounded-lg">
-                                    {/* Header */}
-                                    <div className="text-center mb-8 pb-6 border-b-2 border-gray-300">
-                                        <h1 className="text-2xl md:text-4xl font-bold mb-2">{portfolioData.name}</h1>
-                                        <p className="text-lg md:text-xl text-gray-600 mb-3">{portfolioData.title}</p>
-                                        <div className="flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 text-sm text-gray-600">
-                                            <span>{portfolioData.email}</span>
-                                            <span className="hidden md:inline">•</span>
-                                            <span>{portfolioData.phone}</span>
-                                            <span className="hidden md:inline">•</span>
-                                            <span>{portfolioData.location}</span>
+                                {/* Project Feedback Section */}
+                                <div className="border-t border-white/10 pt-6">
+                                    <h4 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                                        <svg className="w-5 h-5 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                        </svg>
+                                        Share Your Feedback
+                                    </h4>
+                                    <p className="text-gray-400 text-sm mb-4">Have suggestions for improving this project? Let me know!</p>
+                                    <form onSubmit={(e) => {
+                                        e.preventDefault();
+                                        const formData = new FormData(e.target);
+                                        fetch('https://formspree.io/f/xdaaapaw', {
+                                            method: 'POST',
+                                            headers: { 'Content-Type': 'application/json' },
+                                            body: JSON.stringify({
+                                                name: formData.get('feedback_name') || 'Anonymous',
+                                                email: formData.get('feedback_email') || 'No email provided',
+                                                _subject: `Project Feedback: ${selectedProject.name}`,
+                                                message: `Project: ${selectedProject.name}\n\nFeedback:\n${formData.get('feedback_message')}`
+                                            })
+                                        }).then(response => {
+                                            if (response.ok) {
+                                                setFeedbackStatus({ type: 'success', message: 'Thank you! Your feedback has been sent.' });
+                                                e.target.reset();
+                                                setTimeout(() => setFeedbackStatus({ type: '', message: '' }), 3000);
+                                            } else {
+                                                setFeedbackStatus({ type: 'error', message: 'Failed to send. Please try again.' });
+                                            }
+                                        }).catch(() => {
+                                            setFeedbackStatus({ type: 'error', message: 'Network error. Please try again.' });
+                                        });
+                                    }} className="space-y-3">
+                                        <div className="grid md:grid-cols-2 gap-3">
+                                            <input
+                                                type="text"
+                                                name="feedback_name"
+                                                placeholder="Your name (optional)"
+                                                className="px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white text-sm focus:border-pink-500 focus:outline-none transition-all"
+                                            />
+                                            <input
+                                                type="email"
+                                                name="feedback_email"
+                                                placeholder="Your email (optional)"
+                                                className="px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white text-sm focus:border-pink-500 focus:outline-none transition-all"
+                                            />
                                         </div>
-                                    </div>
-
-                                    {/* Summary */}
-                                    <div className="mb-6 text-left">
-                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Professional Summary</h2>
-                                        <p className="text-gray-700 leading-relaxed text-sm md:text-base">{portfolioData.resume.summary}</p>
-                                    </div>
-
-                                    {/* Education */}
-                                    <div className="mb-6 text-left">
-                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Education</h2>
-                                        {portfolioData.resume.education.map((edu, i) => (
-                                            <div key={i} className="mb-4">
-                                                <h3 className="text-base md:text-lg font-semibold">{edu.degree}</h3>
-                                                <p className="text-gray-700 text-sm md:text-base">{edu.university} | {edu.year} | GPA: {edu.gpa}</p>
+                                        <textarea
+                                            name="feedback_message"
+                                            required
+                                            rows={3}
+                                            placeholder="Your feedback or suggestions..."
+                                            className="w-full px-4 py-2 bg-slate-900/50 border border-white/10 rounded-lg text-white text-sm focus:border-pink-500 focus:outline-none transition-all resize-none"
+                                        />
+                                        {feedbackStatus.message && (
+                                            <div className={`p-3 rounded-lg text-sm ${feedbackStatus.type === 'success' ? 'bg-green-500/20 border border-green-500/30 text-green-300' : 'bg-red-500/20 border border-red-500/30 text-red-300'}`}>
+                                                {feedbackStatus.message}
                                             </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Experience */}
-                                    <div className="mb-6 text-left">
-                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Work Experience</h2>
-                                        {portfolioData.experience.map((exp, i) => (
-                                            <div key={i} className="mb-4">
-                                                <h3 className="text-base md:text-lg font-semibold">{exp.role}</h3>
-                                                <p className="text-gray-600 mb-1 text-sm md:text-base">{exp.company} | {exp.duration}</p>
-                                                <p className="text-gray-700 text-sm md:text-base">{exp.description}</p>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Skills */}
-                                    <div className="mb-6 text-left">
-                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Technical Skills</h2>
-                                        <p className="text-gray-700 text-sm md:text-base">{portfolioData.skills.join(' • ')}</p>
-                                    </div>
-
-                                    {/* Certifications */}
-                                    <div className="text-left">
-                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Certifications</h2>
-                                        {portfolioData.certificates.map((cert, i) => (
-                                            <div key={i} className="mb-2">
-                                                <p className="text-gray-700 text-sm md:text-base"><strong>{cert.name}</strong> - {cert.issuer} ({cert.date})</p>
-                                            </div>
-                                        ))}
-                                    </div>
+                                        )}
+                                        <button
+                                            type="submit"
+                                            className="w-full px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-lg font-semibold transition-all text-sm shadow-lg hover:shadow-xl"
+                                        >
+                                            Send Feedback
+                                        </button>
+                                    </form>
                                 </div>
 
-                                <div className="flex justify-center mt-6">
-                                    <button
-                                        onClick={() => window.open(portfolioData.resume.downloadLink, '_blank')}
-                                        className="px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white rounded-lg transition-all flex items-center gap-3 font-semibold"
-                                    >
-                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                {/* Action Buttons */}
+                                <div className="grid md:grid-cols-2 gap-4 pt-4">
+                                    <button onClick={() => window.open(selectedProject.githubLink || portfolioData.githubUrl, '_blank')} className="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white rounded-lg transition-all shadow-lg hover:shadow-xl">
+                                        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
                                         </svg>
-                                        Download as PDF
+                                        <div className="text-left">
+                                            <div className="font-semibold">View on GitHub</div>
+                                            <div className="text-xs text-gray-400">{selectedProject.githubLink ? 'Repository' : 'Visit Profile'}</div>
+                                        </div>
+                                    </button>
+                                    <button onClick={() => selectedProject.articleLink && window.open(selectedProject.articleLink, '_blank')} disabled={!selectedProject.articleLink} className={`flex items-center justify-center gap-3 px-6 py-4 rounded-lg transition-all shadow-lg ${selectedProject.articleLink ? 'bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600 text-white hover:shadow-xl' : 'bg-gray-700/50 text-gray-400 cursor-not-allowed'}`}>
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <div className="text-left">
+                                            <div className="font-semibold">{selectedProject.articleLink ? 'Read Article' : 'Article Coming Soon'}</div>
+                                            <div className="text-xs opacity-80">{selectedProject.articleLink ? 'Technical write-up' : 'In progress...'}</div>
+                                        </div>
                                     </button>
                                 </div>
+                                {!selectedProject.githubLink && (
+                                    <div className="mt-4 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                                        <p className="text-sm text-blue-300 flex items-start gap-2">
+                                            <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <span>This project's repository is private. Click the GitHub button to visit my profile for more public projects.</span>
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
                 )}
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

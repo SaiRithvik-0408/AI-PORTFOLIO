@@ -1,5 +1,7 @@
-import resumePDF from './assets/K Sai Rithvik-resume.pdf';
+import resumePDF from './assets/resume.pdf';
 import homeGif from './assets/giphy.gif';
+import aiPortfolioImg1 from './assets/project-images/1.png';
+import aiPortfolioImg2 from './assets/project-images/2.png';
 
 export const initialSectionVisibility = {
     home: true,
@@ -35,7 +37,7 @@ export const portfolioData = {
         "AWS", "Docker", "Git", "React.js", "Node.js"
     ],
     githubUrl: "https://github.com/SaiRithvik-0408",
-    linkedinUrl: "https://www.linkedin.com/in/sai-rithvik-k-a62933248/",
+    linkedinUrl: "https://www.linkedin.com/in/sai-rithvik-karnati-a62933248/",
     experience: [
         {
             role: "Full Stack Developer",
@@ -54,22 +56,126 @@ export const portfolioData = {
         {
             name: "AI Agentic Portfolio",
             tech: "React, Vite, Tailwind CSS, AI Integration",
-            description: "A dynamic portfolio website featuring an AI assistant for natural language navigation and queries, built with modern web technologies."
+            description: "A dynamic portfolio website featuring an AI assistant for natural language navigation and queries, built with modern web technologies.",
+            detailedDescription: "An innovative portfolio website that leverages AI technology to provide an interactive user experience. Features include natural language processing for navigation, dynamic content loading, real-time coding statistics from LeetCode and CodeChef, and a modern glassmorphism design. Built with React 19 and Vite for optimal performance.",
+            images: [aiPortfolioImg1, aiPortfolioImg2],
+            features: [
+                "AI-powered natural language navigation",
+                "Real-time LeetCode and CodeChef stats fetching",
+                "Dynamic section visibility controls",
+                "Responsive glassmorphism design",
+                "Admin portal for configuration",
+                "Contact form integration with Formspree"
+            ],
+            businessQuestions: [
+                {
+                    question: "How can AI enhance user engagement on portfolio websites?",
+                    answer: "AI-powered natural language navigation allows visitors to interact conversationally, making the experience more intuitive and memorable. This reduces bounce rates and increases time spent on the site."
+                },
+                {
+                    question: "What metrics demonstrate technical proficiency to recruiters?",
+                    answer: "Real-time coding statistics from platforms like LeetCode and CodeChef provide quantifiable proof of problem-solving skills, showing both breadth (total problems solved) and depth (difficulty distribution)."
+                },
+                {
+                    question: "How to balance aesthetics with performance in modern web apps?",
+                    answer: "Using React 19 with Vite ensures fast build times and optimal runtime performance, while Tailwind CSS enables beautiful designs without sacrificing load speed through efficient CSS generation."
+                }
+            ],
+            githubLink: "https://github.com/SaiRithvik-0408/AI-PORTFOLIO",
+            articleLink: "https://github.com/SaiRithvik-0408/AI-PORTFOLIO"
         },
         {
             name: "Online Bidding/Auction Platform",
             tech: "Pycharm, MySQL, HTML, CSS",
-            description: "A dynamic web-based application facilitating engaging and transparent auction processes. Sellers can list items, and buyers place bids to win, maximizing value through an interactive interface."
+            description: "A dynamic web-based application facilitating engaging and transparent auction processes. Sellers can list items, and buyers place bids to win, maximizing value through an interactive interface.",
+            detailedDescription: "A comprehensive online auction platform that enables sellers to list items and buyers to participate in competitive bidding. Features include real-time bid updates, user authentication, item categorization, bid history tracking, and automated winner notification. Built with Python backend and MySQL database for reliable transaction handling.",
+            image: null,
+            features: [
+                "Real-time bidding system with live updates",
+                "User authentication and authorization",
+                "Item categorization and search functionality",
+                "Bid history and tracking",
+                "Automated winner notification system",
+                "Secure payment integration"
+            ],
+            businessQuestions: [
+                {
+                    question: "How to ensure fair and transparent bidding processes?",
+                    answer: "Implementing real-time bid updates and comprehensive bid history tracking ensures all participants have equal access to information. Automated timestamp verification prevents bid manipulation."
+                },
+                {
+                    question: "What strategies maximize seller revenue and buyer satisfaction?",
+                    answer: "Dynamic pricing algorithms suggest optimal starting prices, while competitive bidding naturally drives prices to fair market value. Automated notifications keep buyers engaged throughout the auction lifecycle."
+                },
+                {
+                    question: "How to prevent fraud and ensure transaction security?",
+                    answer: "Multi-layer authentication, secure payment gateway integration, and MySQL transaction management ensure data integrity. User verification and escrow-like payment holding protect both buyers and sellers."
+                }
+            ],
+            githubLink: null,
+            articleLink: null
         },
         {
             name: "Airline Reservation System",
             tech: "Spring Boot, Java, MySQL, HTML, CSS",
-            description: "A centralized platform for searching flights, making reservations, and managing bookings. Features specialized administrative tools for schedule and ticketing management."
+            description: "A centralized platform for searching flights, making reservations, and managing bookings. Features specialized administrative tools for schedule and ticketing management.",
+            detailedDescription: "A full-stack airline reservation system built with Spring Boot that streamlines the flight booking process. Includes features like flight search with filters, seat selection, booking management, payment integration, admin dashboard for flight scheduling, and automated email confirmations. Implements RESTful APIs and follows MVC architecture.",
+            image: null,
+            features: [
+                "Advanced flight search with multiple filters",
+                "Interactive seat selection interface",
+                "Booking management and modification",
+                "Payment gateway integration",
+                "Admin dashboard for flight scheduling",
+                "Automated email confirmations and reminders"
+            ],
+            businessQuestions: [
+                {
+                    question: "How to optimize seat allocation for maximum revenue?",
+                    answer: "Dynamic pricing based on seat location and demand, combined with real-time availability tracking, enables revenue optimization. The system supports multiple fare classes to capture different customer segments."
+                },
+                {
+                    question: "What features improve customer booking experience?",
+                    answer: "Interactive seat maps, flexible booking modification options, and automated email confirmations reduce friction. Advanced filters help customers quickly find flights matching their preferences."
+                },
+                {
+                    question: "How to handle peak traffic during holiday seasons?",
+                    answer: "Spring Boot's scalable architecture and connection pooling in MySQL ensure high performance under load. Caching frequently accessed flight data and implementing queue-based booking prevents system overload."
+                }
+            ],
+            githubLink: null,
+            articleLink: null
         },
         {
             name: "Glaucoma Detection",
             tech: "Deep Learning, Python",
-            description: "Advanced medical imaging project achieving 90% accuracy in detecting Glaucoma using fundus eye images through trained deep learning algorithms."
+            description: "Advanced medical imaging project achieving 90% accuracy in detecting Glaucoma using fundus eye images through trained deep learning algorithms.",
+            detailedDescription: "A machine learning project focused on early detection of Glaucoma using deep learning techniques. Utilizes convolutional neural networks (CNN) trained on fundus eye images to identify glaucoma patterns with 90% accuracy. Includes image preprocessing, data augmentation, model training with TensorFlow/Keras, and a user-friendly interface for medical professionals to upload and analyze eye images.",
+            image: null,
+            features: [
+                "90% accuracy in glaucoma detection",
+                "CNN-based image analysis",
+                "Image preprocessing and augmentation",
+                "User-friendly interface for medical professionals",
+                "Batch processing capabilities",
+                "Detailed diagnostic reports generation"
+            ],
+            businessQuestions: [
+                {
+                    question: "How can AI assist in early disease detection?",
+                    answer: "Deep learning models can identify subtle patterns in fundus images that may be missed by human examination, enabling earlier intervention. The 90% accuracy rate demonstrates clinical viability for screening applications."
+                },
+                {
+                    question: "What accuracy threshold is acceptable for medical diagnosis?",
+                    answer: "While 90% accuracy is strong for screening, the system is designed as a diagnostic aid rather than replacement for professional judgment. It helps prioritize cases for detailed examination by ophthalmologists."
+                },
+                {
+                    question: "How to make AI diagnostics accessible to rural healthcare?",
+                    answer: "The lightweight Python implementation can run on standard hardware, making it deployable in resource-constrained settings. Batch processing capabilities allow efficient screening of large populations with minimal infrastructure."
+                }
+            ],
+            githubLink: null,
+            articleLink: null
         }
     ],
     certificates: [
@@ -113,7 +219,7 @@ export const portfolioData = {
         {
             name: "CodeChef",
             username: "sairithvik0408",
-            stats: { rating: 0, stars: "0★", globalRank: "N/A", countryRank: "N/A" },
+            stats: { rating: 1651, stars: "3★", globalRank: "Inactive", countryRank: "Inactive" },
             badges: []
         }
     ],

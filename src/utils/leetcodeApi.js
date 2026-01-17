@@ -27,7 +27,7 @@ export async function fetchLeetCodeStats(username) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-        const response = await fetch(`${LEETCODE_API_URL}/${username}`, {
+        const response = await fetch(`${LEETCODE_API_URL}/userProfile/${username}`, {
             signal: controller.signal
         });
 
@@ -47,7 +47,7 @@ export async function fetchLeetCodeStats(username) {
             hard: data.hardSolved || 0,
             ranking: data.ranking ? `#${data.ranking.toLocaleString()}` : 'N/A',
             acceptanceRate: data.acceptanceRate || 0,
-            contributionPoints: data.contributionPoints || 0
+            contributionPoints: data.contributionPoint || 0
         };
 
         // Cache the result

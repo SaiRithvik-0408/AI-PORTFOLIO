@@ -4,6 +4,7 @@
  */
 
 const CODECHEF_API_URL = 'https://codechef-api.vercel.app';
+// Alternative: 'https://competitive-coding-api.herokuapp.com/api/codechef'
 const CACHE_KEY_PREFIX = 'codechef_stats_';
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour in milliseconds
 
