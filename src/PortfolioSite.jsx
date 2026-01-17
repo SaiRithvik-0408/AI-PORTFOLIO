@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, User, Briefcase, Mail, Code, Sparkles, Github, Linkedin } from 'lucide-react';
+import { Search, User, Briefcase, Mail, Code, Sparkles, Github, Linkedin, Menu, X, ChevronDown } from 'lucide-react';
 import { portfolioData, sectionVisibility } from './config';
 import { processAIQuery } from './utils/aiLogic';
 
@@ -11,6 +11,8 @@ const PortfolioSite = () => {
     const [showAIPopup, setShowAIPopup] = useState(false);
     const [suggestedSection, setSuggestedSection] = useState(null);
     const [showResumePreview, setShowResumePreview] = useState(false);
+    const [scrollY, setScrollY] = useState(0);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Backend settings - not visible to users
     // Backend settings - not visible to users
@@ -125,6 +127,15 @@ const PortfolioSite = () => {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
+    // Track scroll position for transparency effects
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrollY(window.scrollY);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
     const scrollToSection = (ref) => {
         if (ref.current) {
             const y = ref.current.getBoundingClientRect().top + window.scrollY - 100; // 100px offset for fixed navbar
@@ -184,66 +195,161 @@ const PortfolioSite = () => {
 
             <div className="relative z-10">
                 {/* Fixed Navigation - Pill Shaped */}
-                <nav className="fixed top-0 left-0 right-0 bg-slate-900/80 backdrop-blur-lg border-b border-white/10 z-50">
-                    <div className="max-w-6xl mx-auto px-6 py-4">
-                        <div className="flex justify-center">
-                            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-lg rounded-full px-3 py-2 border border-white/10">
-                                {[
-                                    { name: 'Home', ref: homeRef, key: 'home' },
-                                    { name: 'About', ref: aboutRef, key: 'about' },
-                                    { name: 'Resume', ref: resumeRef, key: 'resume' },
-                                    { name: 'Projects', ref: projectsRef, key: 'projects' },
-                                    { name: 'Certificates', ref: certificatesRef, key: 'certificates' },
-                                    { name: 'Coding', ref: codingRef, key: 'coding' },
-                                    { name: 'Contact', ref: contactRef, key: 'contact' }
-                                ].filter(item => sectionVisibility[item.key]).map(({ name, ref }) => (
-                                    <button
-                                        key={name}
-                                        onClick={() => scrollToSection(ref)}
-                                        className="px-6 py-2 rounded-full text-gray-300 hover:bg-indigo-500/20 hover:text-white transition-all"
-                                    >
-                                        {name}
-                                    </button>
-                                ))}
+                <nav
+                    className="fixed top-0 left-0 right-0 backdrop-blur-lg border-b border-white/10 z-50 transition-all duration-300"
+                    style={{
+                        backgroundColor: `rgba(15, 23, 42, ${Math.min(0.8, 0.3 + scrollY / 500)})`
+                    }}
+                >
+                    <div className="max-w-[95%] xl:max-w-[1400px] mx-auto px-4 md:px-6 py-4">
+                        <div className="flex justify-between items-center">
+                            {/* Logo or Name for mobile */}
+                            <div className="md:hidden flex items-center gap-2">
+                                <Sparkles className="text-indigo-400" size={24} />
+                                <span className="text-white font-bold">Portfolio</span>
                             </div>
+
+                            {/* Desktop Menu */}
+                            <div className="hidden md:flex justify-center flex-1">
+                                <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur-lg rounded-full px-3 py-2 border border-white/10">
+                                    {[
+                                        { name: 'Home', ref: homeRef, key: 'home' },
+                                        { name: 'About', ref: aboutRef, key: 'about' },
+                                        { name: 'Resume', ref: resumeRef, key: 'resume' },
+                                        { name: 'Projects', ref: projectsRef, key: 'projects' },
+                                        { name: 'Certificates', ref: certificatesRef, key: 'certificates' },
+                                        { name: 'Coding', ref: codingRef, key: 'coding' },
+                                        { name: 'Contact', ref: contactRef, key: 'contact' }
+                                    ].filter(item => sectionVisibility[item.key]).map(({ name, ref }) => (
+                                        <button
+                                            key={name}
+                                            onClick={() => scrollToSection(ref)}
+                                            className="px-6 py-2 rounded-full text-gray-300 hover:bg-indigo-500/20 hover:text-white transition-all whitespace-nowrap"
+                                        >
+                                            {name}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Mobile Menu Toggle */}
+                            <button
+                                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                                className="md:hidden p-2 text-white hover:bg-white/10 rounded-lg transition-all"
+                            >
+                                {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                            </button>
                         </div>
+
+                        {/* Mobile Menu Items */}
+                        {isMenuOpen && (
+                            <div className="md:hidden mt-4 bg-slate-800/90 backdrop-blur-xl rounded-2xl p-4 border border-white/10 shadow-2xl animate-fade-in-down">
+                                <div className="flex flex-col gap-2">
+                                    {[
+                                        { name: 'Home', ref: homeRef, key: 'home' },
+                                        { name: 'About', ref: aboutRef, key: 'about' },
+                                        { name: 'Resume', ref: resumeRef, key: 'resume' },
+                                        { name: 'Projects', ref: projectsRef, key: 'projects' },
+                                        { name: 'Certificates', ref: certificatesRef, key: 'certificates' },
+                                        { name: 'Coding', ref: codingRef, key: 'coding' },
+                                        { name: 'Contact', ref: contactRef, key: 'contact' }
+                                    ].filter(item => sectionVisibility[item.key]).map(({ name, ref }) => (
+                                        <button
+                                            key={name}
+                                            onClick={() => {
+                                                scrollToSection(ref);
+                                                setIsMenuOpen(false);
+                                            }}
+                                            className="w-full px-6 py-3 rounded-xl text-left text-gray-300 hover:bg-indigo-500/20 hover:text-white transition-all flex items-center justify-between"
+                                        >
+                                            {name}
+                                            <ChevronDown size={16} className="-rotate-90 opacity-50" />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </nav>
 
                 {/* Spacer for fixed navbar */}
                 <div className="h-20"></div>
 
-                <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
+                <div className="max-w-[95%] xl:max-w-[1400px] mx-auto px-4 md:px-6 py-8 space-y-8">
 
                     {/* Home Section */}
                     {sectionVisibility.home && (
-                        <section ref={homeRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-12 border border-white/10 min-h-[80vh] flex flex-col justify-center">
-                            <h1 className="text-7xl font-bold mb-4 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                                {portfolioData.name}
-                            </h1>
-                            <p className="text-3xl text-gray-300 mb-6">{portfolioData.title}</p>
-                            <p className="text-xl text-gray-400 mb-8 max-w-2xl">
-                                Passionate about building innovative solutions at the intersection of AI and web development.
-                                Transforming ideas into elegant, scalable applications.
-                            </p>
-                            <div className="flex gap-4">
-                                <button className="px-8 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-all flex items-center gap-2">
-                                    <Github size={20} />
-                                    GitHub
-                                </button>
-                                <button className="px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all flex items-center gap-2">
-                                    <Linkedin size={20} />
-                                    LinkedIn
-                                </button>
+                        <section ref={homeRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10 min-h-[80vh] flex flex-col justify-center">
+                            <div className="grid lg:grid-cols-2 gap-12 items-center">
+                                <div className="space-y-6">
+                                    <h1 className="text-4xl md:text-7xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight">
+                                        {portfolioData.name}
+                                    </h1>
+                                    <p className="text-xl md:text-3xl text-gray-300">{portfolioData.title}</p>
+                                    <p className="text-lg md:text-xl text-gray-400 max-w-2xl">
+                                        Passionate about building innovative solutions at the intersection of AI and web development.
+                                        Transforming ideas into elegant, scalable applications.
+                                    </p>
+                                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                                        <a
+                                            href={portfolioData.githubUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full sm:w-auto px-8 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <Github size={20} />
+                                            GitHub
+                                        </a>
+                                        <a
+                                            href={portfolioData.linkedinUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="w-full sm:w-auto px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all flex items-center justify-center gap-2"
+                                        >
+                                            <Linkedin size={20} />
+                                            LinkedIn
+                                        </a>
+                                    </div>
+                                </div>
+
+                                {/* Dynamic Image Column */}
+                                <div className="hidden lg:flex items-center justify-center">
+                                    <div className="relative group w-full max-w-[350px]">
+                                        {/* Border Trace Light */}
+                                        <div className="absolute -inset-[2px] rounded-3xl overflow-hidden pointer-events-none">
+                                            <div className="absolute inset-[-150%] animate-rotate-slow bg-conic-glow opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                                        </div>
+
+                                        {/* Hover intensified glow */}
+                                        <div className={`absolute -inset-[1px] rounded-3xl bg-gradient-to-r ${portfolioData.ui.colors.glow} opacity-0 group-hover:opacity-60 blur-sm transition-opacity duration-500`}></div>
+                                        <div className={`absolute -inset-4 bg-${portfolioData.ui.colors.primary}/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700`}></div>
+
+                                        <div className="relative bg-slate-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+                                            <div className="w-full aspect-square bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center relative">
+                                                <img
+                                                    src={portfolioData.ui.homeGif}
+                                                    alt="Animated Coding Workflow"
+                                                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500 scale-105 group-hover:scale-100"
+                                                />
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-slate-900/40 to-transparent">
+                                                    <div className="p-4 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/10 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                                        <Sparkles className="text-indigo-400 mx-auto mb-2" size={32} />
+                                                        <p className="text-white text-sm font-medium">Developing the Future</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </section>
                     )}
 
                     {/* About Section */}
                     {sectionVisibility.about && (
-                        <section ref={aboutRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-12 border border-white/10">
-                            <h2 className="text-5xl font-bold text-white mb-8 flex items-center gap-3">
-                                <User className="text-indigo-400" size={40} />
+                        <section ref={aboutRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10">
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 flex items-center gap-3">
+                                <User className="text-indigo-400" size={32} md:size={40} />
                                 About Me
                             </h2>
 
@@ -277,9 +383,9 @@ const PortfolioSite = () => {
 
                     {/* Resume Section */}
                     {sectionVisibility.resume && (
-                        <section ref={resumeRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-12 border border-white/10">
-                            <h2 className="text-5xl font-bold text-white mb-8 flex items-center gap-3">
-                                <Briefcase className="text-cyan-400" size={40} />
+                        <section ref={resumeRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10">
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 flex items-center gap-3">
+                                <Briefcase className="text-cyan-400" size={32} md:size={40} />
                                 Resume
                             </h2>
 
@@ -309,10 +415,10 @@ const PortfolioSite = () => {
 
                                 {/* Download Resume Button */}
                                 <div className="flex justify-center">
-                                    <div className="relative inline-flex bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg overflow-hidden shadow-lg hover:shadow-cyan-500/50 transition-all">
+                                    <div className="relative inline-flex flex-col sm:flex-row bg-gradient-to-r from-cyan-500 to-blue-500 rounded-lg sm:rounded-xl overflow-hidden shadow-lg hover:shadow-cyan-500/50 transition-all w-full sm:w-auto">
                                         <button
                                             onClick={() => setShowResumePreview(true)}
-                                            className="px-8 py-4 hover:bg-white/10 text-white transition-all flex items-center gap-3 text-lg font-semibold"
+                                            className="px-6 py-4 md:px-8 hover:bg-white/10 text-white transition-all flex items-center justify-center gap-3 text-base md:text-lg font-semibold"
                                         >
                                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -321,11 +427,12 @@ const PortfolioSite = () => {
                                             View Resume
                                         </button>
 
-                                        <div className="w-px bg-white/30"></div>
+                                        <div className="hidden sm:block w-px bg-white/30"></div>
+                                        <div className="block sm:hidden h-px bg-white/30"></div>
 
                                         <button
                                             onClick={() => window.open(portfolioData.resume.downloadLink, '_blank')}
-                                            className="px-8 py-4 hover:bg-white/10 text-white transition-all flex items-center gap-3 text-lg font-semibold"
+                                            className="px-6 py-4 md:px-8 hover:bg-white/10 text-white transition-all flex items-center justify-center gap-3 text-base md:text-lg font-semibold"
                                         >
                                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -340,9 +447,9 @@ const PortfolioSite = () => {
 
                     {/* Projects Section */}
                     {sectionVisibility.projects && (
-                        <section ref={projectsRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-12 border border-white/10">
-                            <h2 className="text-5xl font-bold text-white mb-8 flex items-center gap-3">
-                                <Code className="text-purple-400" size={40} />
+                        <section ref={projectsRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10">
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 flex items-center gap-3">
+                                <Code className="text-purple-400" size={32} md:size={40} />
                                 Projects
                             </h2>
                             <div className="grid md:grid-cols-2 gap-6">
@@ -365,9 +472,9 @@ const PortfolioSite = () => {
 
                     {/* Certificates Section */}
                     {sectionVisibility.certificates && (
-                        <section ref={certificatesRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-12 border border-white/10">
-                            <h2 className="text-5xl font-bold text-white mb-8 flex items-center gap-3">
-                                <Briefcase className="text-green-400" size={40} />
+                        <section ref={certificatesRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10">
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 flex items-center gap-3">
+                                <Briefcase className="text-green-400" size={32} md:size={40} />
                                 Certificates & Achievements
                             </h2>
                             <div className="grid md:grid-cols-2 gap-6">
@@ -398,9 +505,9 @@ const PortfolioSite = () => {
 
                     {/* Coding Platforms Section */}
                     {sectionVisibility.coding && (
-                        <section ref={codingRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-12 border border-white/10">
-                            <h2 className="text-5xl font-bold text-white mb-8 flex items-center gap-3">
-                                <Code className="text-yellow-400" size={40} />
+                        <section ref={codingRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10">
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 flex items-center gap-3">
+                                <Code className="text-yellow-400" size={32} md:size={40} />
                                 Coding Platforms
                             </h2>
                             <div className="grid md:grid-cols-3 gap-6">
@@ -480,9 +587,9 @@ const PortfolioSite = () => {
 
                     {/* Contact Section */}
                     {sectionVisibility.contact && (
-                        <section ref={contactRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-12 border border-white/10 mb-8">
-                            <h2 className="text-5xl font-bold text-white mb-8 flex items-center gap-3">
-                                <Mail className="text-pink-400" size={40} />
+                        <section ref={contactRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10 mb-8">
+                            <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 flex items-center gap-3">
+                                <Mail className="text-pink-400" size={32} md:size={40} />
                                 Get In Touch
                             </h2>
                             <div className="grid md:grid-cols-2 gap-8">
@@ -492,9 +599,15 @@ const PortfolioSite = () => {
                                         Feel free to reach out!
                                     </p>
                                     <div className="space-y-3">
-                                        <div className="flex items-center gap-3 text-gray-300">
-                                            <Mail className="text-indigo-400" size={20} />
-                                            <span>{portfolioData.email}</span>
+                                        <div className="flex flex-col gap-3 text-gray-300">
+                                            <div className="flex items-center gap-3">
+                                                <Mail className="text-indigo-400" size={20} />
+                                                <span>{portfolioData.email}</span>
+                                            </div>
+                                            <div className="flex items-center gap-3 ml-8 text-sm opacity-80">
+                                                <Mail className="text-indigo-400/50" size={16} />
+                                                <span>{portfolioData.secondaryEmail}</span>
+                                            </div>
                                         </div>
                                         <div className="flex items-center gap-3 text-gray-300">
                                             <span className="text-indigo-400">📱</span>
@@ -537,21 +650,23 @@ const PortfolioSite = () => {
 
                 {/* Floating Action Buttons */}
                 <div className="fixed bottom-8 right-8 flex flex-col gap-4 z-50">
-                    {/* Back to Top Button */}
-                    <button
-                        onClick={scrollToTop}
-                        className="w-16 h-16 bg-slate-700/60 hover:bg-slate-600/80 backdrop-blur-sm text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110"
-                        title="Back to Top"
-                    >
-                        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                        </svg>
-                    </button>
+                    {/* Back to Top Button - Only visible when scrolled */}
+                    {scrollY > 300 && (
+                        <button
+                            onClick={scrollToTop}
+                            className="w-16 h-16 bg-slate-700/40 hover:bg-slate-600/60 backdrop-blur-sm text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110"
+                            title="Back to Top"
+                        >
+                            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                            </svg>
+                        </button>
+                    )}
 
                     {/* AI Assistant Button */}
                     <button
                         onClick={() => setShowAIPopup(true)}
-                        className="w-16 h-16 bg-gradient-to-r from-indigo-500/60 to-purple-500/60 hover:from-indigo-500/80 hover:to-purple-500/80 backdrop-blur-sm text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110"
+                        className="w-16 h-16 bg-gradient-to-r from-indigo-500/40 to-purple-500/40 hover:from-indigo-500/60 hover:to-purple-500/60 backdrop-blur-sm text-white rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110"
                         title="AI Assistant"
                     >
                         <Sparkles size={28} />
@@ -659,63 +774,63 @@ const PortfolioSite = () => {
                                 </button>
                             </div>
 
-                            <div className="p-8 overflow-y-auto max-h-[calc(90vh-100px)]">
+                            <div className="p-4 md:p-8 overflow-y-auto max-h-[calc(90vh-100px)]">
                                 {/* Resume Content */}
-                                <div className="bg-white text-gray-900 p-12 rounded-lg">
+                                <div className="bg-white text-gray-900 p-6 md:p-12 rounded-lg">
                                     {/* Header */}
                                     <div className="text-center mb-8 pb-6 border-b-2 border-gray-300">
-                                        <h1 className="text-4xl font-bold mb-2">{portfolioData.name}</h1>
-                                        <p className="text-xl text-gray-600 mb-3">{portfolioData.title}</p>
-                                        <div className="flex justify-center gap-4 text-sm text-gray-600">
+                                        <h1 className="text-2xl md:text-4xl font-bold mb-2">{portfolioData.name}</h1>
+                                        <p className="text-lg md:text-xl text-gray-600 mb-3">{portfolioData.title}</p>
+                                        <div className="flex flex-col md:flex-row justify-center items-center gap-2 md:gap-4 text-sm text-gray-600">
                                             <span>{portfolioData.email}</span>
-                                            <span>•</span>
+                                            <span className="hidden md:inline">•</span>
                                             <span>{portfolioData.phone}</span>
-                                            <span>•</span>
+                                            <span className="hidden md:inline">•</span>
                                             <span>{portfolioData.location}</span>
                                         </div>
                                     </div>
 
                                     {/* Summary */}
-                                    <div className="mb-6">
-                                        <h2 className="text-2xl font-bold mb-3 text-cyan-600">Professional Summary</h2>
-                                        <p className="text-gray-700 leading-relaxed">{portfolioData.resume.summary}</p>
+                                    <div className="mb-6 text-left">
+                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Professional Summary</h2>
+                                        <p className="text-gray-700 leading-relaxed text-sm md:text-base">{portfolioData.resume.summary}</p>
                                     </div>
 
                                     {/* Education */}
-                                    <div className="mb-6">
-                                        <h2 className="text-2xl font-bold mb-3 text-cyan-600">Education</h2>
+                                    <div className="mb-6 text-left">
+                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Education</h2>
                                         {portfolioData.resume.education.map((edu, i) => (
                                             <div key={i} className="mb-4">
-                                                <h3 className="text-lg font-semibold">{edu.degree}</h3>
-                                                <p className="text-gray-700">{edu.university} | {edu.year} | GPA: {edu.gpa}</p>
+                                                <h3 className="text-base md:text-lg font-semibold">{edu.degree}</h3>
+                                                <p className="text-gray-700 text-sm md:text-base">{edu.university} | {edu.year} | GPA: {edu.gpa}</p>
                                             </div>
                                         ))}
                                     </div>
 
                                     {/* Experience */}
-                                    <div className="mb-6">
-                                        <h2 className="text-2xl font-bold mb-3 text-cyan-600">Work Experience</h2>
+                                    <div className="mb-6 text-left">
+                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Work Experience</h2>
                                         {portfolioData.experience.map((exp, i) => (
                                             <div key={i} className="mb-4">
-                                                <h3 className="text-lg font-semibold">{exp.role}</h3>
-                                                <p className="text-gray-600 mb-1">{exp.company} | {exp.duration}</p>
-                                                <p className="text-gray-700">{exp.description}</p>
+                                                <h3 className="text-base md:text-lg font-semibold">{exp.role}</h3>
+                                                <p className="text-gray-600 mb-1 text-sm md:text-base">{exp.company} | {exp.duration}</p>
+                                                <p className="text-gray-700 text-sm md:text-base">{exp.description}</p>
                                             </div>
                                         ))}
                                     </div>
 
                                     {/* Skills */}
-                                    <div className="mb-6">
-                                        <h2 className="text-2xl font-bold mb-3 text-cyan-600">Technical Skills</h2>
-                                        <p className="text-gray-700">{portfolioData.skills.join(' • ')}</p>
+                                    <div className="mb-6 text-left">
+                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Technical Skills</h2>
+                                        <p className="text-gray-700 text-sm md:text-base">{portfolioData.skills.join(' • ')}</p>
                                     </div>
 
                                     {/* Certifications */}
-                                    <div>
-                                        <h2 className="text-2xl font-bold mb-3 text-cyan-600">Certifications</h2>
+                                    <div className="text-left">
+                                        <h2 className="text-xl md:text-2xl font-bold mb-3 text-cyan-600">Certifications</h2>
                                         {portfolioData.certificates.map((cert, i) => (
                                             <div key={i} className="mb-2">
-                                                <p className="text-gray-700"><strong>{cert.name}</strong> - {cert.issuer} ({cert.date})</p>
+                                                <p className="text-gray-700 text-sm md:text-base"><strong>{cert.name}</strong> - {cert.issuer} ({cert.date})</p>
                                             </div>
                                         ))}
                                     </div>

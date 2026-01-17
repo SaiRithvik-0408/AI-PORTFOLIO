@@ -1,4 +1,5 @@
 import resumePDF from './assets/K Sai Rithvik-resume.pdf';
+import homeGif from './assets/giphy.gif';
 
 export const sectionVisibility = {
     home: true,
@@ -15,14 +16,17 @@ export const portfolioData = {
     name: "Karnati Sai Rithvik",
     title: "Full Stack & Backend Developer",
     email: "karnatisairithvik@gmail.com",
+    secondaryEmail: "2100032341csehonors@gmail.com",
     phone: "+91-8374402446",
     location: "Vijayawada, Andhra Pradesh",
     skills: [
         "Java", "Python", "JavaScript", "C", "SQL",
-        "Spring Boot", "Django", "MERN Stack",
+        "Spring Boot", "Spring Framework", "Django", "MERN Stack",
         "MySQL", "PostgreSQL", "MongoDB",
         "AWS", "Docker", "Git", "React.js", "Node.js"
     ],
+    githubUrl: "https://github.com/SaiRithvik-0408",
+    linkedinUrl: "https://www.linkedin.com/in/sai-rithvik-k-a62933248/",
     experience: [
         {
             role: "Full Stack Developer",
@@ -44,19 +48,19 @@ export const portfolioData = {
             description: "A dynamic portfolio website featuring an AI assistant for natural language navigation and queries, built with modern web technologies."
         },
         {
-            name: "Image Edit Using OPENCV",
-            tech: "Flask, HTML, Bootstrap, OpenCV",
-            description: "Web-based application for image processing (grayscale, format conversion) with a user-friendly interface."
+            name: "Online Bidding/Auction Platform",
+            tech: "Pycharm, MySQL, HTML, CSS",
+            description: "A dynamic web-based application facilitating engaging and transparent auction processes. Sellers can list items, and buyers place bids to win, maximizing value through an interactive interface."
         },
         {
             name: "Airline Reservation System",
-            tech: "Spring Boot, JSP, Microservices",
-            description: "Microservices-based system designed for fault tolerance where manager and customer functionalities remain operational independently."
+            tech: "Spring Boot, Java, MySQL, HTML, CSS",
+            description: "A centralized platform for searching flights, making reservations, and managing bookings. Features specialized administrative tools for schedule and ticketing management."
         },
         {
             name: "Glaucoma Detection",
             tech: "Deep Learning, Python",
-            description: "Deep learning project to detect glaucoma using fundus images of the eye, achieving 90% accuracy."
+            description: "Advanced medical imaging project achieving 90% accuracy in detecting Glaucoma using fundus eye images through trained deep learning algorithms."
         }
     ],
     certificates: [
@@ -104,10 +108,31 @@ export const portfolioData = {
             {
                 degree: "B.Tech - Computer Science and Engineering",
                 university: "KL University, Guntur",
-                year: "2021 – Present",
+                year: "2021 – 2025",
+                gpa: "9.52 CGPA"
+            },
+            {
+                degree: "Intermediate (12th)",
+                university: "Narayana Junior College",
+                year: "2019 – 2021",
                 gpa: "9.5 CGPA"
+            },
+            {
+                degree: "Secondary School (10th)",
+                university: "SCS (CBSE)",
+                year: "2018 – 2019",
+                gpa: "84.2%"
             }
         ],
         downloadLink: resumePDF
+    },
+    ui: {
+        homeGif: homeGif,
+        colors: {
+            primary: "indigo-500",
+            secondary: "purple-500",
+            accent: "pink-500",
+            glow: "from-indigo-500/50 via-purple-500/50 to-pink-500/50"
+        }
     }
 };

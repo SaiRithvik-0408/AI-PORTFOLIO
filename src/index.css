@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+@layer utilities {
+    @keyframes rotate-slow {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .animate-rotate-slow {
+        animation: rotate-slow 4s linear infinite;
+    }
+
+    .bg-conic-glow {
+        background: conic-gradient(from 0deg, transparent 0%, transparent 80%, #6366f1 90%, #ffffff 95%, #6366f1 100%);
+    }
+}
