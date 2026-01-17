@@ -4,7 +4,7 @@ import AdminPortal from './AdminPortal';
 
 function App() {
   return (
-    <Router>
+    <Router basename="/AI-PORTFOLIO">
       <Routes>
         <Route path="/" element={<PortfolioSite />} />
         <Route path="/login" element={<AdminPortal />} />
