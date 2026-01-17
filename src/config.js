@@ -1,7 +1,7 @@
 import resumePDF from './assets/K Sai Rithvik-resume.pdf';
 import homeGif from './assets/giphy.gif';
 
-export const sectionVisibility = {
+export const initialSectionVisibility = {
     home: true,
     about: true,
     resume: true,
@@ -10,6 +10,15 @@ export const sectionVisibility = {
     coding: false,
     contact: true,
     background3D: false
+};
+
+export const getSectionVisibility = () => {
+    const saved = localStorage.getItem('sectionVisibility');
+    return saved ? JSON.parse(saved) : initialSectionVisibility;
+};
+
+export const setSectionVisibility = (visibility) => {
+    localStorage.setItem('sectionVisibility', JSON.stringify(visibility));
 };
 
 export const portfolioData = {
@@ -133,6 +142,7 @@ export const portfolioData = {
             secondary: "purple-500",
             accent: "pink-500",
             glow: "from-indigo-500/50 via-purple-500/50 to-pink-500/50"
-        }
+        },
+        contactFormEndpoint: "https://formspree.io/f/xvzzzwrw"
     }
 };

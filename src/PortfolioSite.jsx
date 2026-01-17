@@ -1,13 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, User, Briefcase, Mail, Code, Sparkles, Github, Linkedin, Menu, X, ChevronDown } from 'lucide-react';
-import { portfolioData, sectionVisibility } from './config';
+import { portfolioData, getSectionVisibility } from './config';
 import { processAIQuery } from './utils/aiLogic';
+import { handleContactSubmit } from './utils/contactHandler';
 
 const PortfolioSite = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [aiResponse, setAiResponse] = useState('');
     const [isProcessing, setIsProcessing] = useState(false);
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+    const [formStatus, setFormStatus] = useState({ type: '', message: '' });
+    const [sectionVisibility] = useState(getSectionVisibility());
+
+    const handleFormChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
+
+    const handleContactFormSubmit = (e) => {
+        e.preventDefault();
+        handleContactSubmit(formData, setFormStatus, () => setFormData({ name: '', email: '', message: '' }));
+    };
     const [showAIPopup, setShowAIPopup] = useState(false);
     const [suggestedSection, setSuggestedSection] = useState(null);
     const [showResumePreview, setShowResumePreview] = useState(false);
@@ -622,26 +635,51 @@ const PortfolioSite = () => {
 
                                 <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 rounded-xl p-6 border border-indigo-500/30">
                                     <h3 className="text-xl font-semibold text-white mb-4">Quick Message</h3>
-                                    <div className="space-y-3">
+                                    <form onSubmit={handleContactFormSubmit} className="space-y-3">
                                         <input
                                             type="text"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleFormChange}
+                                            required
                                             placeholder="Your Name"
                                             className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
                                         />
                                         <input
                                             type="email"
+                                            name="email"
+                                            value={formData.email}
+                                            onChange={handleFormChange}
+                                            required
                                             placeholder="Your Email"
                                             className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
                                         />
                                         <textarea
+                                            name="message"
+                                            value={formData.message}
+                                            onChange={handleFormChange}
+                                            required
                                             placeholder="Your Message"
                                             rows="4"
                                             className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-indigo-500"
                                         />
-                                        <button className="w-full px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-all">
-                                            Send Message
+
+                                        {formStatus.message && (
+                                            <div className={`text-sm p-3 rounded-lg ${formStatus.type === 'success' ? 'bg-green-500/20 text-green-400' :
+                                                formStatus.type === 'error' ? 'bg-red-500/20 text-red-400' : 'bg-blue-500/20 text-blue-400'
+                                                }`}>
+                                                {formStatus.message}
+                                            </div>
+                                        )}
+
+                                        <button
+                                            type="submit"
+                                            disabled={formStatus.type === 'loading'}
+                                            className="w-full px-6 py-3 bg-indigo-500 hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all"
+                                        >
+                                            {formStatus.type === 'loading' ? 'Sending...' : 'Send Message'}
                                         </button>
-                                    </div>
+                                    </form>
                                 </div>
                             </div>
                         </section>
