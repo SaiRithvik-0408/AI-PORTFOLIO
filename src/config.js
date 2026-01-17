@@ -58,7 +58,7 @@ export const portfolioData = {
             tech: "React, Vite, Tailwind CSS, AI Integration",
             description: "A dynamic portfolio website featuring an AI assistant for natural language navigation and queries, built with modern web technologies.",
             detailedDescription: "An innovative portfolio website that leverages AI technology to provide an interactive user experience. Features include natural language processing for navigation, dynamic content loading, real-time coding statistics from LeetCode and CodeChef, and a modern glassmorphism design. Built with React 19 and Vite for optimal performance.",
-            images: [aiPortfolioImg1, aiPortfolioImg2],
+            images: [aiPortfolioImg1, aiPortfolioImg2, aiPortfolioImg2, aiPortfolioImg2, aiPortfolioImg2],
             features: [
                 "AI-powered natural language navigation",
                 "Real-time LeetCode and CodeChef stats fetching",

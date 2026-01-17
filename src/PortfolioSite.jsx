@@ -22,6 +22,9 @@ const PortfolioSite = () => {
     const [showFeedbackModal, setShowFeedbackModal] = useState(false);
     const [feedbackData, setFeedbackData] = useState({ name: '', email: '', suggestion: '' });
     const [feedbackStatus, setFeedbackStatus] = useState({ type: '', message: '' });
+    const [enlargedImage, setEnlargedImage] = useState(null);
+    const [showGallery, setShowGallery] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const handleFormChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -251,6 +254,12 @@ const PortfolioSite = () => {
                 }, 1500);
             } else if (result.action === "suggest" && result.section) {
                 setSuggestedSection(result.section);
+            } else if (result.action === "openProject") {
+                // Open project modal
+                setSelectedProject(result.project);
+                setShowProjectModal(true);
+                // Also scroll to projects section
+                scrollToSection(projectsRef); // Use the ref for scrolling
             }
         } catch (error) {
             console.error(error);
@@ -355,66 +364,69 @@ const PortfolioSite = () => {
                 {/* Spacer for fixed navbar */}
                 <div className="h-20"></div>
 
-                <div className="max-w-[95%] xl:max-w-[1400px] mx-auto px-4 md:px-6 py-8 space-y-8">
+                {/* Main Content */}
+                <main className="container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-8 space-y-6 max-w-7xl">
 
                     {/* Home Section */}
                     {sectionVisibility.home && (
-                        <section ref={homeRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10 min-h-[80vh] flex flex-col justify-center">
-                            <div className="grid lg:grid-cols-2 gap-12 items-center">
-                                <div className="space-y-6">
-                                    <h1 className="text-4xl md:text-7xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight">
-                                        {portfolioData.name}
-                                    </h1>
-                                    <p className="text-xl md:text-3xl text-gray-300">{portfolioData.title}</p>
-                                    <p className="text-lg md:text-xl text-gray-400 max-w-2xl">
-                                        Passionate about building innovative solutions at the intersection of AI and web development.
-                                        Transforming ideas into elegant, scalable applications.
-                                    </p>
-                                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
-                                        <a
-                                            href={portfolioData.githubUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full sm:w-auto px-8 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-all flex items-center justify-center gap-2"
-                                        >
-                                            <Github size={20} />
-                                            GitHub
-                                        </a>
-                                        <a
-                                            href={portfolioData.linkedinUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="w-full sm:w-auto px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all flex items-center justify-center gap-2"
-                                        >
-                                            <Linkedin size={20} />
-                                            LinkedIn
-                                        </a>
-                                    </div>
-                                </div>
-
-                                {/* Dynamic Image Column */}
-                                <div className="hidden lg:flex items-center justify-center">
-                                    <div className="relative group w-full max-w-[350px]">
-                                        {/* Border Trace Light */}
-                                        <div className="absolute -inset-[2px] rounded-3xl overflow-hidden pointer-events-none">
-                                            <div className="absolute inset-[-150%] animate-rotate-slow bg-conic-glow opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                        <section ref={homeRef} className="flex items-center justify-center py-12">
+                            <div className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 md:p-10 lg:p-12 border border-white/10 w-full">
+                                <div className="grid lg:grid-cols-2 gap-12 items-center">
+                                    <div className="space-y-6">
+                                        <h1 className="text-4xl md:text-7xl font-bold bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent leading-tight">
+                                            {portfolioData.name}
+                                        </h1>
+                                        <p className="text-xl md:text-3xl text-gray-300">{portfolioData.title}</p>
+                                        <p className="text-lg md:text-xl text-gray-400 max-w-2xl">
+                                            Passionate about building innovative solutions at the intersection of AI and web development.
+                                            Transforming ideas into elegant, scalable applications.
+                                        </p>
+                                        <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                                            <a
+                                                href={portfolioData.githubUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-full sm:w-auto px-8 py-3 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg transition-all flex items-center justify-center gap-2"
+                                            >
+                                                <Github size={20} />
+                                                GitHub
+                                            </a>
+                                            <a
+                                                href={portfolioData.linkedinUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="w-full sm:w-auto px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-all flex items-center justify-center gap-2"
+                                            >
+                                                <Linkedin size={20} />
+                                                LinkedIn
+                                            </a>
                                         </div>
+                                    </div>
 
-                                        {/* Hover intensified glow */}
-                                        <div className={`absolute -inset-[1px] rounded-3xl bg-gradient-to-r ${portfolioData.ui.colors.glow} opacity-0 group-hover:opacity-60 blur-sm transition-opacity duration-500`}></div>
-                                        <div className={`absolute -inset-4 bg-${portfolioData.ui.colors.primary}/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700`}></div>
+                                    {/* Dynamic Image Column */}
+                                    <div className="hidden lg:flex items-center justify-center">
+                                        <div className="relative group w-full max-w-[350px]">
+                                            {/* Border Trace Light */}
+                                            <div className="absolute -inset-[2px] rounded-3xl overflow-hidden pointer-events-none">
+                                                <div className="absolute inset-[-150%] animate-rotate-slow bg-conic-glow opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                                            </div>
 
-                                        <div className="relative bg-slate-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
-                                            <div className="w-full aspect-square bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center relative">
-                                                <img
-                                                    src={portfolioData.ui.homeGif}
-                                                    alt="Animated Coding Workflow"
-                                                    className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500 scale-105 group-hover:scale-100"
-                                                />
-                                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-slate-900/40 to-transparent">
-                                                    <div className="p-4 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/10 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
-                                                        <Sparkles className="text-indigo-400 mx-auto mb-2" size={32} />
-                                                        <p className="text-white text-sm font-medium">Developing the Future</p>
+                                            {/* Hover intensified glow */}
+                                            <div className={`absolute -inset-[1px] rounded-3xl bg-gradient-to-r ${portfolioData.ui.colors.glow} opacity-0 group-hover:opacity-60 blur-sm transition-opacity duration-500`}></div>
+                                            <div className={`absolute -inset-4 bg-${portfolioData.ui.colors.primary}/10 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700`}></div>
+
+                                            <div className="relative bg-slate-900 rounded-3xl overflow-hidden border border-white/10 shadow-2xl">
+                                                <div className="w-full aspect-square bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center relative">
+                                                    <img
+                                                        src={portfolioData.ui.homeGif}
+                                                        alt="Animated Coding Workflow"
+                                                        className="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-opacity duration-500 scale-105 group-hover:scale-100"
+                                                    />
+                                                    <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-t from-slate-900/40 to-transparent">
+                                                        <div className="p-4 bg-slate-900/60 backdrop-blur-md rounded-2xl border border-white/10 transform translate-y-4 group-hover:translate-y-0 opacity-0 group-hover:opacity-100 transition-all duration-500">
+                                                            <Sparkles className="text-indigo-400 mx-auto mb-2" size={32} />
+                                                            <p className="text-white text-sm font-medium">Developing the Future</p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -430,7 +442,7 @@ const PortfolioSite = () => {
                         <section ref={aboutRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10">
                             <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 flex items-center gap-3">
                                 <User className="text-indigo-400" size={32} md:size={40} />
-                                About Me
+                                Experience
                             </h2>
 
                             <div className="grid md:grid-cols-2 gap-8 mb-8">
@@ -446,7 +458,7 @@ const PortfolioSite = () => {
                                 </div>
 
                                 <div>
-                                    <h3 className="text-2xl font-semibold text-white mb-4">Experience</h3>
+                                    <h3 className="text-2xl font-semibold text-white mb-4">Professional Experience</h3>
                                     <div className="space-y-4">
                                         {portfolioData.experience.map((exp, i) => (
                                             <div key={i} className="bg-white/5 p-4 rounded-lg border border-white/10">
@@ -461,12 +473,12 @@ const PortfolioSite = () => {
                         </section>
                     )}
 
-                    {/* Resume Section */}
+                    {/* Education & Credentials Section */}
                     {sectionVisibility.resume && (
                         <section ref={resumeRef} className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 md:p-12 border border-white/10">
                             <h2 className="text-3xl md:text-5xl font-bold text-white mb-8 flex items-center gap-3">
                                 <Briefcase className="text-cyan-400" size={32} md:size={40} />
-                                Resume
+                                Education & Credentials
                             </h2>
 
                             <div className="space-y-8">
@@ -804,7 +816,28 @@ const PortfolioSite = () => {
                             </div>
                         </section>
                     )}
-                </div>
+
+                    {/* Footer */}
+                    <footer className="mt-12 py-6 border-t border-white/10 bg-red-500/5 backdrop-blur-sm rounded-lg">
+                        <div className="text-center space-y-2">
+                            <p className="text-red-400 font-semibold flex items-center justify-center gap-2">
+                                <span className="text-lg">™</span>
+                                <span>Designed & Developed by</span>
+                                <a
+                                    href="https://github.com/SaiRithvik-0408"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="hover:text-red-300 transition-colors underline decoration-red-400/50 hover:decoration-red-300"
+                                >
+                                    @SaiRithvik-0408
+                                </a>
+                            </p>
+                            <p className="text-gray-400 text-sm">
+                                © {new Date().getFullYear()} All rights reserved
+                            </p>
+                        </div>
+                    </footer>
+                </main>
 
                 {/* Floating Action Buttons */}
                 <div className="fixed bottom-8 right-8 flex flex-col gap-4 z-50">
@@ -1036,16 +1069,16 @@ const PortfolioSite = () => {
                                 </div>
                             </div>
                             <div className="p-6 space-y-6">
-                                {/* Project Images */}
-                                {((selectedProject.images && selectedProject.images.length > 0) || selectedProject.image) && (
+                                {/* Project Images - REMOVED, now showing thumbnails after description */}
+                                {/* {((selectedProject.images && selectedProject.images.length > 0) || selectedProject.image) && (
                                     <div className="rounded-lg overflow-hidden border border-indigo-500/30">
                                         <img
-                                            src={selectedProject.image}
+                                            src={selectedProject.images?.[0] || selectedProject.image}
                                             alt={selectedProject.name}
                                             className="w-full h-auto object-cover"
                                         />
                                     </div>
-                                )}
+                                )} */}
 
                                 {/* Project Description */}
                                 <div>
@@ -1057,6 +1090,55 @@ const PortfolioSite = () => {
                                     </h4>
                                     <p className="text-gray-300 leading-relaxed">{selectedProject.detailedDescription || selectedProject.description}</p>
                                 </div>
+
+                                {/* Project Images Gallery */}
+                                {selectedProject.images && selectedProject.images.length > 0 && (
+                                    <div>
+                                        <h4 className="text-xl font-semibold text-white mb-3 flex items-center gap-2">
+                                            <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            Project Screenshots
+                                        </h4>
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {selectedProject.images.slice(0, 2).map((img, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    onClick={() => {
+                                                        setEnlargedImage(img);
+                                                        setCurrentImageIndex(idx);
+                                                    }}
+                                                    className="relative group cursor-pointer rounded-lg overflow-hidden border border-indigo-500/30 hover:border-indigo-500/60 transition-all"
+                                                >
+                                                    <img
+                                                        src={img}
+                                                        alt={`${selectedProject.name} - Screenshot ${idx + 1}`}
+                                                        className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-300"
+                                                    />
+                                                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                                                        <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                            {selectedProject.images.length > 2 && (
+                                                <div
+                                                    onClick={() => setShowGallery(true)}
+                                                    className="relative group cursor-pointer rounded-lg overflow-hidden border-2 border-purple-500/50 hover:border-purple-400 transition-all bg-slate-900/30 backdrop-blur-sm shadow-[0_0_15px_rgba(168,85,247,0.4)] hover:shadow-[0_0_25px_rgba(168,85,247,0.6)]"
+                                                >
+                                                    <div className="w-full h-32 flex flex-col items-center justify-center">
+                                                        <svg className="w-10 h-10 text-purple-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                                        </svg>
+                                                        <span className="text-white font-semibold text-lg">+{selectedProject.images.length - 2} more</span>
+                                                        <span className="text-gray-400 text-xs mt-1">Click to view all</span>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Features & Analysis */}
                                 {selectedProject.features && selectedProject.features.length > 0 && (
@@ -1211,7 +1293,149 @@ const PortfolioSite = () => {
                             </div>
                         </div>
                     </div>
-                )}
+                )
+                }
+
+                {/* Full Gallery Modal */}
+                {
+                    showGallery && selectedProject && (
+                        <div
+                            className="fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
+                            onClick={() => setShowGallery(false)}
+                        >
+                            <div className="relative max-w-6xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                                <div className="sticky top-0 bg-slate-900/95 backdrop-blur-lg p-4 border-b border-white/10 flex items-center justify-between mb-4 rounded-t-lg">
+                                    <h3 className="text-2xl font-bold text-white">All Screenshots - {selectedProject.name}</h3>
+                                    <button
+                                        onClick={() => setShowGallery(false)}
+                                        className="text-white hover:text-gray-300 transition-colors"
+                                    >
+                                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                </div>
+                                <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4 bg-slate-900/50 rounded-b-lg">
+                                    {selectedProject.images.map((img, idx) => (
+                                        <div
+                                            key={idx}
+                                            onClick={() => {
+                                                setEnlargedImage(img);
+                                                setShowGallery(false);
+                                                setCurrentImageIndex(idx);
+                                            }}
+                                            className="relative group cursor-pointer rounded-lg overflow-hidden border border-indigo-500/30 hover:border-indigo-500/60 transition-all"
+                                        >
+                                            <img
+                                                src={img}
+                                                alt={`${selectedProject.name} - Screenshot ${idx + 1}`}
+                                                className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-300"
+                                            />
+                                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center">
+                                                <svg className="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+                                                </svg>
+                                            </div>
+                                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                                                <span className="text-white text-sm font-medium">Image {idx + 1} of {selectedProject.images.length}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+
+                {/* Image Lightbox Modal */}
+                {
+                    enlargedImage && selectedProject && (
+                        <div
+                            className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[60] p-4"
+                            onClick={() => {
+                                setEnlargedImage(null);
+                                setCurrentImageIndex(0);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'ArrowLeft') {
+                                    const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : selectedProject.images.length - 1;
+                                    setCurrentImageIndex(newIndex);
+                                    setEnlargedImage(selectedProject.images[newIndex]);
+                                } else if (e.key === 'ArrowRight') {
+                                    const newIndex = currentImageIndex < selectedProject.images.length - 1 ? currentImageIndex + 1 : 0;
+                                    setCurrentImageIndex(newIndex);
+                                    setEnlargedImage(selectedProject.images[newIndex]);
+                                } else if (e.key === 'Escape') {
+                                    setEnlargedImage(null);
+                                    setCurrentImageIndex(0);
+                                }
+                            }}
+                            tabIndex={0}
+                        >
+                            <div className="relative max-w-7xl max-h-[90vh]">
+                                {/* Close Button */}
+                                <button
+                                    onClick={() => {
+                                        setEnlargedImage(null);
+                                        setCurrentImageIndex(0);
+                                    }}
+                                    className="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors z-10"
+                                >
+                                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+
+                                {/* Image Counter */}
+                                <div className="absolute -top-12 left-0 text-white text-sm bg-black/50 px-3 py-1 rounded">
+                                    {currentImageIndex + 1} / {selectedProject.images.length}
+                                </div>
+
+                                {/* Previous Button */}
+                                {selectedProject.images.length > 1 && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            const newIndex = currentImageIndex > 0 ? currentImageIndex - 1 : selectedProject.images.length - 1;
+                                            setCurrentImageIndex(newIndex);
+                                            setEnlargedImage(selectedProject.images[newIndex]);
+                                        }}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all z-10"
+                                    >
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                    </button>
+                                )}
+
+                                {/* Image */}
+                                <img
+                                    src={enlargedImage}
+                                    alt={`${selectedProject.name} - Image ${currentImageIndex + 1}`}
+                                    className="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl"
+                                    onClick={(e) => e.stopPropagation()}
+                                />
+
+                                {/* Next Button */}
+                                {selectedProject.images.length > 1 && (
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            const newIndex = currentImageIndex < selectedProject.images.length - 1 ? currentImageIndex + 1 : 0;
+                                            setCurrentImageIndex(newIndex);
+                                            setEnlargedImage(selectedProject.images[newIndex]);
+                                        }}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all z-10"
+                                    >
+                                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    )
+                }
             </div >
         </div >
     );
