@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Search, User, Briefcase, Mail, Code, Sparkles, Github, Linkedin } from 'lucide-react';
+import { portfolioData, sectionVisibility } from './config';
 
 const PortfolioSite = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -11,16 +12,7 @@ const PortfolioSite = () => {
     const [showResumePreview, setShowResumePreview] = useState(false);
 
     // Backend settings - not visible to users
-    const sectionVisibility = {
-        home: true,
-        about: true,
-        resume: true,
-        projects: true,
-        certificates: true,
-        coding: true,
-        contact: true,
-        background3D: false
-    };
+    // Backend settings - not visible to users
 
     const canvasRef = useRef(null);
     const homeRef = useRef(null);
@@ -31,132 +23,7 @@ const PortfolioSite = () => {
     const codingRef = useRef(null);
     const contactRef = useRef(null);
 
-    // Sample portfolio data
-    const portfolioData = {
-        name: "Alex Johnson",
-        title: "Full Stack Developer & AI Engineer",
-        email: "alex.johnson@example.com",
-        phone: "+1 (555) 123-4567",
-        location: "San Francisco, CA",
-        skills: ["React", "Node.js", "Python", "TensorFlow", "Three.js", "AI/ML", "TypeScript", "Docker"],
-        experience: [
-            {
-                role: "Senior Developer",
-                company: "TechCorp",
-                duration: "2021-Present",
-                description: "Leading development of AI-powered applications and microservices architecture"
-            },
-            {
-                role: "AI Engineer",
-                company: "AI Solutions",
-                duration: "2019-2021",
-                description: "Built machine learning models and deployed production ML pipelines"
-            },
-            {
-                role: "Full Stack Developer",
-                company: "StartupXYZ",
-                duration: "2017-2019",
-                description: "Developed responsive web applications using React and Node.js"
-            }
-        ],
-        projects: [
-            {
-                name: "AI Chatbot Platform",
-                tech: "React, Node.js, GPT, WebSocket",
-                description: "Real-time conversational AI platform with natural language processing"
-            },
-            {
-                name: "3D Visualization Tool",
-                tech: "Three.js, WebGL, React",
-                description: "Interactive 3D data visualization dashboard for enterprise analytics"
-            },
-            {
-                name: "E-commerce Platform",
-                tech: "Next.js, PostgreSQL, Stripe",
-                description: "Full-featured online store with payment integration and admin panel"
-            }
-        ],
-        certificates: [
-            {
-                name: "AWS Certified Solutions Architect",
-                issuer: "Amazon Web Services",
-                date: "2024",
-                credentialId: "AWS-SA-2024-12345"
-            },
-            {
-                name: "TensorFlow Developer Certificate",
-                issuer: "Google",
-                date: "2023",
-                credentialId: "TF-DEV-2023-67890"
-            },
-            {
-                name: "Meta Front-End Developer",
-                issuer: "Meta",
-                date: "2023",
-                credentialId: "META-FE-2023-45678"
-            },
-            {
-                name: "Certified Kubernetes Administrator",
-                issuer: "Cloud Native Computing Foundation",
-                date: "2024",
-                credentialId: "CKA-2024-98765"
-            }
-        ],
-        codingPlatforms: [
-            {
-                name: "LeetCode",
-                username: "alex_codes",
-                stats: {
-                    solved: 847,
-                    easy: 312,
-                    medium: 421,
-                    hard: 114,
-                    ranking: "Top 5%"
-                },
-                badges: ["Guardian", "Knight", "100 Days Badge 2024"]
-            },
-            {
-                name: "CodeChef",
-                username: "alex_chef",
-                stats: {
-                    rating: 2145,
-                    stars: "5★",
-                    globalRank: 1243,
-                    countryRank: 89
-                },
-                badges: ["20 Day Streak", "Contest Winner"]
-            },
-            {
-                name: "Codeforces",
-                username: "alex_cf",
-                stats: {
-                    rating: 1876,
-                    rank: "Candidate Master",
-                    maxRating: 1923,
-                    contests: 67
-                },
-                badges: []
-            }
-        ],
-        resume: {
-            summary: "Innovative Full Stack Developer and AI Engineer with 7+ years of experience building scalable web applications and machine learning solutions. Proven track record of leading development teams and delivering high-impact projects.",
-            education: [
-                {
-                    degree: "Master of Science in Computer Science",
-                    university: "Stanford University",
-                    year: "2017",
-                    gpa: "3.9/4.0"
-                },
-                {
-                    degree: "Bachelor of Science in Software Engineering",
-                    university: "MIT",
-                    year: "2015",
-                    gpa: "3.8/4.0"
-                }
-            ],
-            downloadLink: "#"
-        }
-    };
+
 
     // 3D Background Effect
     useEffect(() => {
@@ -544,7 +411,16 @@ If they ask a question about skills, experience, or want information, set action
                                 {portfolioData.certificates.map((cert, i) => (
                                     <div key={i} className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 backdrop-blur-lg rounded-xl p-6 border border-green-500/30 hover:border-green-500/60 transition-all hover:scale-105">
                                         <div className="flex items-start justify-between mb-3">
-                                            <h3 className="text-2xl font-semibold text-white">{cert.name}</h3>
+                                            <h3 className="text-2xl font-semibold text-white">
+                                                {cert.link ? (
+                                                    <a href={cert.link} target="_blank" rel="noopener noreferrer" className="hover:text-green-300 flex items-center gap-2 transition-colors">
+                                                        {cert.name}
+                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                                    </a>
+                                                ) : (
+                                                    cert.name
+                                                )}
+                                            </h3>
                                             <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded text-sm">
                                                 {cert.date}
                                             </span>
